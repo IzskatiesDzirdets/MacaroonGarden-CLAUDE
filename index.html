@@ -8,11 +8,12 @@
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- React, Babel & Three.js -->
+  <!-- React, Babel, Three.js & GLTFLoader -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -100,17 +101,16 @@
   <script type="text/babel">
     const { useState, useEffect, useRef } = React;
 
-    // Astoņi konfigurēti lietotāja un paroles piekļuves dati
     const ADMIN_CREDENTIALS = {
       username: "admin",
-      password: "password123" // Nomainiet pret vēlamo paroli
+      password: "password123"
     };
 
     const MOODS = [
-      { id: 'romantic', name: 'Romantiskā', color: '#E0A9AF', bgClass: 'bg-[#FDF0F0]', macaronColor: 0xE0A9AF },
-      { id: 'fresh', name: 'Svaigā', color: '#A8E6CF', bgClass: 'bg-[#E8F8F5]', macaronColor: 0xA8E6CF },
-      { id: 'luxury', name: 'Luksuss', color: '#D4AF37', bgClass: 'bg-[#FAF4E8]', macaronColor: 0xD4AF37 },
-      { id: 'berry', name: 'Ogu', color: '#D980FA', bgClass: 'bg-[#F8EFBA]', macaronColor: 0xD980FA }
+      { id: 'romantic', name: 'Romantiskā', color: '#E0A9AF', bgClass: 'bg-[#FDF0F0]' },
+      { id: 'fresh', name: 'Svaigā', color: '#A8E6CF', bgClass: 'bg-[#E8F8F5]' },
+      { id: 'luxury', name: 'Luksuss', color: '#D4AF37', bgClass: 'bg-[#FAF4E8]' },
+      { id: 'berry', name: 'Ogu', color: '#D980FA', bgClass: 'bg-[#F8EFBA]' }
     ];
 
     const FLAVORS = [
@@ -128,9 +128,9 @@
       { size: 24, label: 'Kaste 24 gab.', discount: 0.10, gridCols: 'grid-cols-6 sm:grid-cols-8' }
     ];
 
-    function Macaron3D({ activeMood }) {
+    // Real macaron.glb loader
+    function Macaron3D() {
       const containerRef = useRef(null);
-      const macaronMeshRef = useRef(null);
 
       useEffect(() => {
         if (!containerRef.current) return;
@@ -140,49 +140,42 @@
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-        camera.position.z = 5;
+        camera.position.set(0, 0, 5);
 
         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         renderer.setSize(width, height);
         containerRef.current.appendChild(renderer.domElement);
 
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
         scene.add(ambientLight);
 
-        const dirLight = new THREE.DirectionalLight(0xffffff, 1);
-        dirLight.position.set(5, 5, 5);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
+        dirLight.position.set(5, 10, 7);
         scene.add(dirLight);
 
-        const group = new THREE.Group();
+        let modelGroup = new THREE.Group();
+        scene.add(modelGroup);
 
-        const shellGeo = new THREE.CylinderGeometry(1.2, 1.2, 0.35, 32);
-        const shellMat = new THREE.MeshStandardMaterial({ 
-          color: activeMood.macaronColor, 
-          roughness: 0.3, 
-          metalness: 0.1 
+        // Ielādējam tavu macaron.glb failu
+        const loader = new THREE.GLTFLoader();
+        loader.load('macaron.glb', (gltf) => {
+          const model = gltf.scene;
+          
+          // Centram un mērogojam modeli
+          const box = new THREE.Box3().setFromObject(model);
+          const center = box.getCenter(new THREE.Vector3());
+          model.position.sub(center);
+
+          modelGroup.add(model);
+        }, undefined, (error) => {
+          console.error("Kļūda ielādējot macaron.glb:", error);
         });
-
-        const topShell = new THREE.Mesh(shellGeo, shellMat);
-        topShell.position.y = 0.25;
-        group.add(topShell);
-
-        const bottomShell = new THREE.Mesh(shellGeo, shellMat);
-        bottomShell.position.y = -0.25;
-        group.add(bottomShell);
-
-        const fillingGeo = new THREE.CylinderGeometry(1.05, 1.05, 0.2, 32);
-        const fillingMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.8 });
-        const filling = new THREE.Mesh(fillingGeo, fillingMat);
-        group.add(filling);
-
-        scene.add(group);
-        macaronMeshRef.current = { group, shellMat };
 
         let animationFrameId;
         const animate = () => {
           animationFrameId = requestAnimationFrame(animate);
-          group.rotation.y += 0.01;
-          group.rotation.x = Math.sin(Date.now() * 0.001) * 0.15;
+          modelGroup.rotation.y += 0.008;
+          modelGroup.rotation.x = Math.sin(Date.now() * 0.001) * 0.1;
           renderer.render(scene, camera);
         };
         animate();
@@ -206,12 +199,6 @@
         };
       }, []);
 
-      useEffect(() => {
-        if (macaronMeshRef.current) {
-          macaronMeshRef.current.shellMat.color.setHex(activeMood.macaronColor);
-        }
-      }, [activeMood]);
-
       return <div ref={containerRef} className="w-full h-full min-h-[350px]" />;
     }
 
@@ -223,7 +210,6 @@
       const [formData, setFormData] = useState({ name: '', phone: '', email: '', date: '', notes: '' });
       const [showModal, setShowModal] = useState(false);
 
-      // Admin Login Stāvokļi
       const [showLoginModal, setShowLoginModal] = useState(false);
       const [loginUser, setLoginUser] = useState('');
       const [loginPass, setLoginPass] = useState('');
@@ -267,7 +253,6 @@
         e.preventDefault();
         if (loginUser === ADMIN_CREDENTIALS.username && loginPass === ADMIN_CREDENTIALS.password) {
           setLoginError('');
-          // Pāradresē uz admin.html
           window.location.href = 'admin.html';
         } else {
           setLoginError('Nepareizs lietotājvārds vai parole!');
@@ -336,41 +321,45 @@
             )}
           </header>
 
-          <section id="hero" className="py-16 md:py-20 max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <span className="text-xs uppercase tracking-widest text-brand-accent font-semibold bg-white/80 px-3 py-1 rounded-full inline-block shadow-sm">
-                Interaktīvs 3D dizains
+          {/* SĀKUMA SEKCIJA: POGAS PAŠĀ AUGŠĀ */}
+          <section id="hero" className="pt-8 pb-16 md:py-16 max-w-6xl mx-auto px-4 space-y-8">
+            
+            {/* NOSKAŅAS IZVĒLES POGAS PAŠĀ SĀKUMĀ */}
+            <div className="bg-white/80 backdrop-blur-md p-4 md:p-6 rounded-2xl border border-white/80 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+              <span className="text-sm font-bold uppercase tracking-wider text-brand-dark">
+                Izvēlies lapas noskaņu:
               </span>
-              <h1 className="text-5xl md:text-6xl font-bold leading-tight">
-                Izvēlieties savu dienas <span className="italic text-brand-accent">noskaņu</span>
-              </h1>
-              <p className="text-gray-600 text-lg">
-                Klikšķiniet uz pogām zemāk, lai mainītu lapas atmosfēru un 3D makarūna krāsu!
-              </p>
-
-              <div className="space-y-2 pt-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-500">Izvēlēties noskaņu:</span>
-                <div className="flex flex-wrap gap-3">
-                  {MOODS.map(mood => (
-                    <button
-                      key={mood.id}
-                      onClick={() => setActiveMood(mood)}
-                      className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all shadow-sm ${
-                        activeMood.id === mood.id 
-                          ? 'bg-brand-dark text-white shadow-md scale-105' 
-                          : 'bg-white text-gray-700 hover:bg-gray-50'
-                      }`}
-                    >
-                      {mood.name}
-                    </button>
-                  ))}
-                </div>
+              <div className="flex flex-wrap gap-3">
+                {MOODS.map(mood => (
+                  <button
+                    key={mood.id}
+                    onClick={() => setActiveMood(mood)}
+                    className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all shadow-sm ${
+                      activeMood.id === mood.id 
+                        ? 'bg-brand-dark text-white shadow-md scale-105' 
+                        : 'bg-white text-gray-700 hover:bg-rose-50'
+                    }`}
+                  >
+                    {mood.name}
+                  </button>
+                ))}
               </div>
             </div>
 
-            <div className="bg-white/60 backdrop-blur-md border border-white/80 rounded-3xl p-6 shadow-xl relative flex flex-col items-center justify-center">
-              <Macaron3D activeMood={activeMood} />
-              <p className="text-xs text-gray-400 mt-2">Interaktīvs 3D makarūna modelis</p>
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div className="space-y-6">
+                <h1 className="text-5xl md:text-6xl font-bold leading-tight">
+                  Izbaudiet īstu <span className="italic text-brand-accent">garšas mākslu</span>
+                </h1>
+                <p className="text-gray-600 text-lg">
+                  Katra kaste tiek veidota no augstākās kvalitātes sastāvdaļām ar īpašu rūpību un mīlestību.
+                </p>
+              </div>
+
+              <div className="bg-white/60 backdrop-blur-md border border-white/80 rounded-3xl p-6 shadow-xl relative flex flex-col items-center justify-center">
+                <Macaron3D />
+                <p className="text-xs text-gray-400 mt-2">Interaktīvs macaron.glb 3D modelis</p>
+              </div>
             </div>
           </section>
 
@@ -595,7 +584,7 @@
 
           </main>
 
-          {/* VEIKSMES MODĀLAIS LOGS */}
+          {/* MODĀLIE LOGI */}
           {showModal && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
               <div className="bg-white max-w-md w-full p-8 rounded-3xl shadow-2xl space-y-6 text-center transform animate-pop-in">
@@ -622,7 +611,6 @@
             </div>
           )}
 
-          {/* ADMIN IEEJAS LOGS */}
           {showLoginModal && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
               <div className="bg-white max-w-sm w-full p-8 rounded-3xl shadow-2xl space-y-6 relative transform animate-pop-in">
