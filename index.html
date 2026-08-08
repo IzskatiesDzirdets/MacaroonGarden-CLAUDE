@@ -128,7 +128,6 @@
       { size: 24, label: 'Kaste 24 gab.', discount: 0.10, gridCols: 'grid-cols-6 sm:grid-cols-8' }
     ];
 
-    // Real macaron.glb loader
     function Macaron3D() {
       const containerRef = useRef(null);
 
@@ -140,32 +139,41 @@
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-        camera.position.set(0, 0, 5);
 
         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         renderer.setSize(width, height);
         containerRef.current.appendChild(renderer.domElement);
 
-        const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1.4);
         scene.add(ambientLight);
 
-        const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1.8);
         dirLight.position.set(5, 10, 7);
         scene.add(dirLight);
 
         let modelGroup = new THREE.Group();
         scene.add(modelGroup);
 
-        // Ielādējam tavu macaron.glb failu
         const loader = new THREE.GLTFLoader();
         loader.load('macaron.glb', (gltf) => {
           const model = gltf.scene;
-          
-          // Centram un mērogojam modeli
-          const box = new THREE.Box3().setFromObject(model);
-          const center = box.getCenter(new THREE.Vector3());
-          model.position.sub(center);
 
+          // Automātiska mērogošana un kameras pielāgošana
+          const box = new THREE.Box3().setFromObject(model);
+          const size = box.getSize(new THREE.Vector3());
+          const center = box.getCenter(new THREE.Vector3());
+
+          // Centram modeli
+          model.position.x -= center.x;
+          model.position.y -= center.y;
+          model.position.z -= center.z;
+
+          // Aprēķinām maksimālo izmēru un mērogojam
+          const maxDim = Math.max(size.x, size.y, size.z);
+          const scale = 2.5 / maxDim;
+          model.scale.set(scale, scale, scale);
+
+          camera.position.set(0, 0, 5);
           modelGroup.add(model);
         }, undefined, (error) => {
           console.error("Kļūda ielādējot macaron.glb:", error);
@@ -251,8 +259,11 @@
 
       const handleAdminLogin = (e) => {
         e.preventDefault();
-        if (loginUser === ADMIN_CREDENTIALS.username && loginPass === ADMIN_CREDENTIALS.password) {
+        e.stopPropagation();
+        
+        if (loginUser.trim() === ADMIN_CREDENTIALS.username && loginPass.trim() === ADMIN_CREDENTIALS.password) {
           setLoginError('');
+          setShowLoginModal(false);
           window.location.href = 'admin.html';
         } else {
           setLoginError('Nepareizs lietotājvārds vai parole!');
@@ -280,6 +291,7 @@
 
               <div className="hidden md:flex items-center gap-3">
                 <button 
+                  type="button"
                   onClick={() => setShowLoginModal(true)}
                   className="text-xs font-semibold px-3 py-2 text-gray-500 hover:text-brand-dark transition-colors"
                 >
@@ -291,6 +303,7 @@
               </div>
 
               <button 
+                type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="md:hidden p-2 text-brand-dark focus:outline-none"
               >
@@ -312,6 +325,7 @@
                 <a href="#builder" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-sm font-medium">Kastes salicējs</a>
                 <a href="#order" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-sm font-medium">Pasūtīt</a>
                 <button 
+                  type="button"
                   onClick={() => { setMobileMenuOpen(false); setShowLoginModal(true); }} 
                   className="block w-full text-left py-2 text-sm font-bold text-brand-accent"
                 >
@@ -321,10 +335,7 @@
             )}
           </header>
 
-          {/* SĀKUMA SEKCIJA: POGAS PAŠĀ AUGŠĀ */}
           <section id="hero" className="pt-8 pb-16 md:py-16 max-w-6xl mx-auto px-4 space-y-8">
-            
-            {/* NOSKAŅAS IZVĒLES POGAS PAŠĀ SĀKUMĀ */}
             <div className="bg-white/80 backdrop-blur-md p-4 md:p-6 rounded-2xl border border-white/80 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
               <span className="text-sm font-bold uppercase tracking-wider text-brand-dark">
                 Izvēlies lapas noskaņu:
@@ -333,6 +344,7 @@
                 {MOODS.map(mood => (
                   <button
                     key={mood.id}
+                    type="button"
                     onClick={() => setActiveMood(mood)}
                     className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all shadow-sm ${
                       activeMood.id === mood.id 
@@ -410,6 +422,7 @@
                         <div className="flex items-center gap-2">
                           {count > 0 && (
                             <button 
+                              type="button"
                               onClick={() => removeLastItemOfId(flavor.id)}
                               className="w-8 h-8 rounded-xl bg-white text-brand-dark font-bold flex items-center justify-center shadow-sm"
                             >
@@ -418,6 +431,7 @@
                           )}
                           {count > 0 && <span className="text-sm font-bold w-4 text-center">{count}</span>}
                           <button 
+                            type="button"
                             onClick={() => addItem(flavor)}
                             disabled={boxItems.length >= selectedBoxSize}
                             className="bg-brand-dark text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-sm hover:bg-brand-accent transition-all disabled:opacity-50"
@@ -443,6 +457,7 @@
                   {BOX_SIZES.map(box => (
                     <button
                       key={box.size}
+                      type="button"
                       onClick={() => {
                         setSelectedBoxSize(box.size);
                         setBoxItems([]);
@@ -584,7 +599,7 @@
 
           </main>
 
-          {/* MODĀLIE LOGI */}
+          {/* VEIKSMES MODĀLAIS LOGS */}
           {showModal && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
               <div className="bg-white max-w-md w-full p-8 rounded-3xl shadow-2xl space-y-6 text-center transform animate-pop-in">
@@ -598,6 +613,7 @@
                   </p>
                 </div>
                 <button 
+                  type="button"
                   onClick={() => {
                     setShowModal(false);
                     setBoxItems([]);
@@ -611,10 +627,12 @@
             </div>
           )}
 
+          {/* ADMIN IEEJAS MODĀLAIS LOGS */}
           {showLoginModal && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
               <div className="bg-white max-w-sm w-full p-8 rounded-3xl shadow-2xl space-y-6 relative transform animate-pop-in">
                 <button 
+                  type="button"
                   onClick={() => setShowLoginModal(false)}
                   className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-lg font-bold"
                 >
