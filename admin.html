@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Macaroon Garden — Admin Panelis</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg:#FDF6EE;--ink:#1C0D07;--rose:#E8A4B8;--rose-d:#C97A96;
+  --gold:#D9A441;--mint:#A8D4B0;--sand:#F0E6D8;--white:#FFFDF9;
+  --sidebar:220px;--danger:#e05555;--success:#4a9e6b;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#f0e8de;font-family:'DM Sans',sans-serif;color:var(--ink);display:flex;height:100vh;overflow:hidden;}
+
+/* ── SIDEBAR ── */
+.sb{width:var(--sidebar);flex-shrink:0;background:var(--ink);display:flex;flex-direction:column;overflow-y:auto;}
+.sb-logo{padding:1.4rem 1.2rem 1rem;border-bottom:1px solid rgba(255,255,255,.08);}
+.sb-logo-txt{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:700;color:#fff;}
+.sb-logo-txt span{color:var(--rose);}
+.sb-logo-sub{font-size:.65rem;color:rgba(255,255,255,.4);margin-top:.2rem;}
+.sb-nav{flex:1;padding:.8rem 0;}
+.sb-section{font-size:.6rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.3);padding:.6rem 1.2rem .3rem;}
+.sb-link{display:flex;align-items:center;gap:.65rem;padding:.65rem 1.2rem;font-size:.82rem;font-weight:500;color:rgba(255,255,255,.6);cursor:pointer;transition:background .15s,color .15s;border:none;background:none;width:100%;text-align:left;}
+.sb-link:hover{background:rgba(255,255,255,.06);color:#fff;}
+.sb-link.active{background:rgba(232,164,184,.15);color:var(--rose);}
+.sb-link .ico{font-size:1rem;width:20px;text-align:center;}
+.sb-footer{padding:1rem 1.2rem;border-top:1px solid rgba(255,255,255,.08);}
+.sb-user{font-size:.72rem;color:rgba(255,255,255,.4);}
+
+/* ── MAIN ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{background:var(--white);border-bottom:1px solid var(--sand);padding:.8rem 1.8rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.topbar-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:700;}
+.topbar-actions{display:flex;gap:.6rem;}
+.content{flex:1;overflow-y:auto;padding:1.8rem;}
+
+/* ── PANELS ── */
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* ── CARDS / GRID ── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;}
+.card{background:var(--white);border-radius:16px;padding:1.4rem;}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;}
+.card-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:700;}
+.stat-big{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:700;color:var(--rose-d);line-height:1;}
+.stat-label{font-size:.72rem;color:#7a5a48;margin-top:.2rem;}
+
+/* ── TABLE ── */
+.tbl-wrap{background:var(--white);border-radius:16px;overflow:hidden;}
+.tbl-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.4rem;border-bottom:1px solid var(--sand);}
+.tbl-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:700;}
+table{width:100%;border-collapse:collapse;}
+thead th{background:var(--sand);padding:.7rem 1rem;text-align:left;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#7a5a48;}
+tbody td{padding:.8rem 1rem;border-bottom:1px solid var(--sand);font-size:.85rem;vertical-align:middle;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:rgba(240,230,216,.4);}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:.3rem;padding:.25rem .65rem;border-radius:999px;font-size:.7rem;font-weight:700;}
+.badge-green{background:rgba(74,158,107,.15);color:var(--success);}
+.badge-red{background:rgba(224,85,85,.12);color:var(--danger);}
+.badge-gold{background:rgba(217,164,65,.15);color:#a07800;}
+.badge-blue{background:rgba(100,150,220,.12);color:#2060b0;}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.55rem 1.1rem;border-radius:10px;font-weight:600;font-size:.82rem;cursor:pointer;border:none;transition:transform .15s,box-shadow .15s;}
+.btn:hover{transform:translateY(-1px);}
+.btn-primary{background:var(--rose-d);color:#fff;}
+.btn-primary:hover{box-shadow:0 6px 18px rgba(201,122,150,.35);}
+.btn-ghost{background:var(--sand);color:var(--ink);}
+.btn-danger{background:rgba(224,85,85,.12);color:var(--danger);}
+.btn-success{background:rgba(74,158,107,.12);color:var(--success);}
+.btn-sm{padding:.35rem .75rem;font-size:.75rem;}
+.btn-icon{width:32px;height:32px;padding:0;justify-content:center;border-radius:8px;}
+
+/* ── FORMS ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.form-full{grid-column:1/-1;}
+.field{display:flex;flex-direction:column;gap:.35rem;}
+.field label{font-size:.75rem;font-weight:600;color:#7a5a48;}
+.field input,.field select,.field textarea{padding:.65rem .9rem;border-radius:10px;border:1.5px solid var(--sand);background:var(--bg);font-size:.85rem;font-family:'DM Sans',sans-serif;color:var(--ink);transition:border-color .2s;}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--rose-d);}
+.field textarea{resize:vertical;min-height:80px;}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:.6rem 0;}
+.toggle-label{font-size:.82rem;font-weight:500;}
+.toggle{position:relative;width:42px;height:22px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-sl{position:absolute;inset:0;background:var(--sand);border-radius:11px;cursor:pointer;transition:.2s;}
+.toggle input:checked+.toggle-sl{background:var(--rose-d);}
+.toggle-sl::before{content:'';position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s;}
+.toggle input:checked+.toggle-sl::before{transform:translateX(20px);}
+
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(28,13,7,.5);backdrop-filter:blur(4px);z-index:800;display:none;align-items:center;justify-content:center;}
+.modal-bg.open{display:flex;}
+.modal{background:var(--white);border-radius:20px;width:min(620px,95vw);max-height:90vh;overflow-y:auto;padding:1.8rem;}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.4rem;}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:700;}
+.modal-close{width:32px;height:32px;border-radius:50%;background:var(--sand);border:none;cursor:pointer;font-size:.9rem;}
+.modal-footer{display:flex;justify-content:flex-end;gap:.6rem;margin-top:1.4rem;padding-top:1.2rem;border-top:1px solid var(--sand);}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--ink);color:#fff;padding:.65rem 1.3rem;border-radius:12px;font-size:.82rem;font-weight:600;z-index:999;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;}
+.toast.show{opacity:1;transform:none;}
+.toast.success{background:var(--success);}
+.toast.error{background:var(--danger);}
+
+/* ── CHALLENGE CARD ── */
+.ch-card{background:var(--white);border-radius:16px;padding:1.2rem;border-left:4px solid var(--rose-d);margin-bottom:.8rem;}
+.ch-title{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:700;margin-bottom:.4rem;}
+.ch-meta{font-size:.75rem;color:#7a5a48;display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:.7rem;}
+.ch-footer{display:flex;align-items:center;justify-content:space-between;}
+.ch-progress{flex:1;margin-right:1rem;}
+.ch-progress-bar{height:6px;background:var(--sand);border-radius:3px;overflow:hidden;margin-top:.3rem;}
+.ch-progress-fill{height:100%;background:var(--rose-d);border-radius:3px;}
+
+/* ── AD PREVIEW ── */
+.ad-preview{background:linear-gradient(135deg,#E8A4B8,#C4B5D4);border-radius:14px;padding:1.2rem;text-align:center;color:#fff;margin-bottom:1rem;}
+.ad-preview-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:700;}
+.ad-preview-body{font-size:.82rem;margin:.4rem 0 .8rem;opacity:.9;}
+.ad-preview-cta{display:inline-block;background:rgba(255,255,255,.9);color:var(--ink);padding:.4rem 1.2rem;border-radius:999px;font-size:.78rem;font-weight:700;}
+
+/* ── VIDEO PANEL ── */
+.video-layout{display:grid;grid-template-columns:320px 1fr;gap:1.2rem;height:calc(100vh - 140px);}
+.video-controls{background:var(--white);border-radius:16px;padding:1.2rem;overflow-y:auto;}
+.video-preview{background:var(--white);border-radius:16px;display:flex;flex-direction:column;overflow:hidden;}
+.v-section{margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--sand);}
+.v-section:last-child{border-bottom:none;margin-bottom:0;}
+.v-label{font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7a5a48;display:block;margin-bottom:.5rem;}
+
+/* Flavor pills */
+.fl-pills{display:flex;flex-wrap:wrap;gap:.4rem;}
+.fl-pill{padding:.3rem .7rem;border-radius:999px;font-size:.75rem;font-weight:600;cursor:pointer;border:2px solid transparent;transition:all .15s;}
+.fl-pill.on{border-color:var(--ink);}
+
+/* Anim / format buttons */
+.seg{display:flex;gap:.3rem;}
+.seg-btn{flex:1;padding:.4rem;border-radius:8px;border:1.5px solid var(--sand);background:var(--bg);font-size:.72rem;font-weight:600;cursor:pointer;text-align:center;transition:all .15s;}
+.seg-btn.on{background:var(--rose-d);border-color:var(--rose-d);color:#fff;}
+
+.cmd-box{background:var(--ink);border-radius:10px;padding:.7rem .9rem;position:relative;margin-top:.5rem;}
+.cmd-txt{font-family:'Courier New',monospace;font-size:.68rem;color:#A8D4B0;word-break:break-all;line-height:1.5;}
+.copy-btn{position:absolute;top:.5rem;right:.5rem;background:rgba(255,255,255,.12);border:none;border-radius:6px;color:#fff;font-size:.65rem;padding:.2rem .5rem;cursor:pointer;}
+
+.preview-bar{padding:.6rem 1rem;border-bottom:1px solid var(--sand);display:flex;align-items:center;gap:.8rem;}
+.play-btn{width:32px;height:32px;border-radius:50%;background:var(--rose-d);color:#fff;border:none;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.tl{flex:1;height:5px;background:var(--sand);border-radius:3px;cursor:pointer;position:relative;}
+.tl-fill{height:100%;background:var(--rose-d);border-radius:3px;}
+.canvas-area{flex:1;display:flex;align-items:center;justify-content:center;padding:1rem;background:#e8e0d8;}
+
+/* ── AUTH SCREEN ── */
+.auth-screen{position:fixed;inset:0;background:var(--ink);display:flex;align-items:center;justify-content:center;z-index:999;}
+.auth-box{background:var(--white);border-radius:20px;padding:2.5rem;width:380px;text-align:center;}
+.auth-logo{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:700;margin-bottom:.3rem;}
+.auth-logo span{color:var(--rose-d);}
+.auth-sub{font-size:.82rem;color:#7a5a48;margin-bottom:2rem;}
+</style>
+</head>
+<body>
+
+<!-- AUTH -->
+<div class="auth-screen" id="authScreen">
+  <div class="auth-box">
+    <div class="auth-logo">Macaroon <span>Garden</span></div>
+    <div class="auth-sub">Admin Panelis</div>
+    <div class="field" style="margin-bottom:.8rem;text-align:left">
+      <label>E-pasts</label>
+      <input type="email" id="authEmail" placeholder="admin@macaroongarden.lv">
+    </div>
+    <div class="field" style="margin-bottom:1.2rem;text-align:left">
+      <label>Parole</label>
+      <input type="password" id="authPass" placeholder="••••••••">
+    </div>
+    <button class="btn btn-primary" style="width:100%;padding:.8rem" onclick="doLogin()">Ielogoties →</button>
+    <div id="authError" style="color:#e05555;font-size:.78rem;margin-top:.6rem;"></div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="sb">
+  <div class="sb-logo">
+    <div class="sb-logo-txt">Macaroon <span>Garden</span></div>
+    <div class="sb-logo-sub">Admin Panelis</div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-section">Pārskats</div>
+    <button class="sb-link active" onclick="nav('dashboard')"><span class="ico">📊</span>Pārskats</button>
+
+    <div class="sb-section">Spēle</div>
+    <button class="sb-link" onclick="nav('challenges')"><span class="ico">🏆</span>Izaicinājumi</button>
+    <button class="sb-link" onclick="nav('leaderboard')"><span class="ico">📋</span>Līderu saraksts</button>
+    <button class="sb-link" onclick="nav('ads')"><span class="ico">📢</span>Reklāmas</button>
+
+    <div class="sb-section">Veikals</div>
+    <button class="sb-link" onclick="nav('products')"><span class="ico">🎁</span>Produkti</button>
+    <button class="sb-link" onclick="nav('discounts')"><span class="ico">🏷️</span>Atlaižu kodi</button>
+    <button class="sb-link" onclick="nav('orders')"><span class="ico">📦</span>Pasūtījumi</button>
+
+    <div class="sb-section">Satura radīšana</div>
+    <button class="sb-link" onclick="nav('video')"><span class="ico">🎬</span>Video ģenerātors</button>
+
+    <div class="sb-section">Sistēma</div>
+    <button class="sb-link" onclick="nav('emails')"><span class="ico">✉️</span>E-pasta žurnāls</button>
+  </nav>
+  <div class="sb-footer">
+    <div class="sb-user" id="sbUser">Ielādē...</div>
+    <button class="btn btn-ghost btn-sm" style="margin-top:.5rem;width:100%" onclick="doLogout()">Iziet</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbarTitle">Pārskats</div>
+    <div class="topbar-actions" id="topbarActions"></div>
+  </div>
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="panel active" id="p-dashboard">
+      <div class="grid-3" style="margin-bottom:1.2rem">
+        <div class="card">
+          <div class="stat-big" id="db-players">—</div>
+          <div class="stat-label">Reģistrēti spēlētāji</div>
+        </div>
+        <div class="card">
+          <div class="stat-big" id="db-orders">—</div>
+          <div class="stat-label">Pasūtījumi</div>
+        </div>
+        <div class="card">
+          <div class="stat-big" id="db-challenges">—</div>
+          <div class="stat-label">Aktīvie izaicinājumi</div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Aktīvie izaicinājumi</div></div>
+          <div id="db-challenge-list"><div style="color:#7a5a48;font-size:.85rem">Ielādē...</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Pēdējie pasūtījumi</div></div>
+          <div id="db-order-list"><div style="color:#7a5a48;font-size:.85rem">Ielādē...</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHALLENGES -->
+    <div class="panel" id="p-challenges">
+      <div id="ch-list"></div>
+    </div>
+
+    <!-- LEADERBOARD -->
+    <div class="panel" id="p-leaderboard">
+      <div class="tbl-wrap">
+        <div class="tbl-header">
+          <div class="tbl-title">Spēlētāju rezultāti</div>
+          <input type="text" placeholder="Meklēt..." style="padding:.4rem .8rem;border-radius:8px;border:1.5px solid var(--sand);font-size:.82rem;" oninput="filterLb(this.value)">
+        </div>
+        <table>
+          <thead><tr><th>#</th><th>Spēlētājs</th><th>Punkti</th><th>Līmeņi</th><th>Gājieni</th></tr></thead>
+          <tbody id="lb-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ADS -->
+    <div class="panel" id="p-ads">
+      <div id="ads-list"></div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <div class="panel" id="p-products">
+      <div style="display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm prod-tab active" data-tab="boxes" onclick="prodTab('boxes')">📦 Kastīšu izmēri</button>
+        <button class="btn btn-ghost btn-sm prod-tab" data-tab="colors" onclick="prodTab('colors')">🎨 Kastīšu krāsas</button>
+        <button class="btn btn-ghost btn-sm prod-tab" data-tab="ribbons" onclick="prodTab('ribbons')">🎀 Lentītes</button>
+        <button class="btn btn-ghost btn-sm prod-tab" data-tab="addons" onclick="prodTab('addons')">✨ Papildpakalpojumi</button>
+        <button class="btn btn-ghost btn-sm prod-tab" data-tab="flavors" onclick="prodTab('flavors')">🌹 Garšas</button>
+      </div>
+      <div id="prod-content"></div>
+    </div>
+
+    <!-- DISCOUNTS -->
+    <div class="panel" id="p-discounts">
+      <div class="tbl-wrap">
+        <div class="tbl-header">
+          <div class="tbl-title">Atlaižu kodi</div>
+          <button class="btn btn-primary btn-sm" onclick="openDiscountModal()">+ Jauns kods</button>
+        </div>
+        <table>
+          <thead><tr><th>Kods</th><th>Tips</th><th>Vērtība</th><th>Izmantots</th><th>Derīgs līdz</th><th>Statuss</th><th></th></tr></thead>
+          <tbody id="disc-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ORDERS -->
+    <div class="panel" id="p-orders">
+      <div class="tbl-wrap">
+        <div class="tbl-header">
+          <div class="tbl-title">Pasūtījumi</div>
+          <select style="padding:.4rem .8rem;border-radius:8px;border:1.5px solid var(--sand);font-size:.82rem;" onchange="filterOrders(this.value)">
+            <option value="">Visi</option>
+            <option value="pending">Gaida</option>
+            <option value="confirmed">Apstiprināts</option>
+            <option value="delivered">Piegādāts</option>
+          </select>
+        </div>
+        <table>
+          <thead><tr><th>ID</th><th>Klients</th><th>Kastīte</th><th>Summa</th><th>Statuss</th><th>Datums</th><th></th></tr></thead>
+          <tbody id="orders-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- VIDEO -->
+    <div class="panel" id="p-video">
+      <div class="video-layout">
+        <!-- Controls -->
+        <div class="video-controls">
+          <div class="v-section">
+            <span class="v-label">Garša</span>
+            <div class="fl-pills" id="v-flavors"></div>
+          </div>
+          <div class="v-section">
+            <span class="v-label">Formāts</span>
+            <div class="seg">
+              <button class="seg-btn on" data-fmt="reels" onclick="vFmt('reels',this)">📱 Reels</button>
+              <button class="seg-btn" data-fmt="story" onclick="vFmt('story',this)">📖 Story</button>
+              <button class="seg-btn" data-fmt="square" onclick="vFmt('square',this)">⬛ Square</button>
+            </div>
+          </div>
+          <div class="v-section">
+            <span class="v-label">Animācija</span>
+            <div class="seg">
+              <button class="seg-btn on" onclick="vAnim('float',this)">🌊 Peld</button>
+              <button class="seg-btn" onclick="vAnim('burst',this)">💥 Sprāgst</button>
+              <button class="seg-btn" onclick="vAnim('slide',this)">➡️ Slīd</button>
+            </div>
+          </div>
+          <div class="v-section">
+            <span class="v-label">Virsraksts</span>
+            <textarea class="field input" id="v-title" rows="2" style="width:100%;padding:.5rem .7rem;border-radius:8px;border:1.5px solid var(--sand);font-size:.82rem;resize:none;font-family:'DM Sans',sans-serif" oninput="vUpdate()">Katrs macarons —
+mākslas darbs</textarea>
+          </div>
+          <div class="v-section">
+            <span class="v-label">Apakšvirsraksts</span>
+            <input id="v-sub" type="text" style="width:100%;padding:.5rem .7rem;border-radius:8px;border:1.5px solid var(--sand);font-size:.82rem;" value="Svaigi cepti Rīgā · Piegāde 24h" oninput="vUpdate()">
+          </div>
+          <div class="v-section">
+            <span class="v-label">CTA</span>
+            <input id="v-cta" type="text" style="width:100%;padding:.5rem .7rem;border-radius:8px;border:1.5px solid var(--sand);font-size:.82rem;" value="Pasūtīt: info@macaroongarden.lv" oninput="vUpdate()">
+          </div>
+          <div class="v-section">
+            <span class="v-label">Render komanda</span>
+            <div class="cmd-box">
+              <div class="cmd-txt" id="v-cmd">npx remotion render MacaronReels out/video.mp4</div>
+              <button class="copy-btn" onclick="copyCmd()">Kopēt</button>
+            </div>
+            <button class="btn btn-primary" style="width:100%;margin-top:.6rem" onclick="copyCmd()">🎬 Kopēt komandu</button>
+          </div>
+        </div>
+        <!-- Preview -->
+        <div class="video-preview">
+          <div class="preview-bar">
+            <button class="play-btn" id="v-play-btn" onclick="vTogglePlay()">▶</button>
+            <div class="tl" id="v-tl" onclick="vScrub(event)">
+              <div class="tl-fill" id="v-tl-fill" style="width:0%"></div>
+            </div>
+            <span style="font-size:.72rem;color:#7a5a48;white-space:nowrap" id="v-frame-lbl">0s</span>
+          </div>
+          <div class="canvas-area">
+            <div id="v-canvas-outer" style="border-radius:12px;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,.22)">
+              <canvas id="v-canvas"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EMAILS -->
+    <div class="panel" id="p-emails">
+      <div class="tbl-wrap">
+        <div class="tbl-header"><div class="tbl-title">E-pasta žurnāls</div></div>
+        <table>
+          <thead><tr><th>Saņēmējs</th><th>Tips</th><th>Temats</th><th>Statuss</th><th>Nosūtīts</th></tr></thead>
+          <tbody id="email-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── MODALS ── -->
+
+<!-- Challenge Modal -->
+<div class="modal-bg" id="ch-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="ch-modal-title">Jauns izaicinājums</div>
+      <button class="modal-close" onclick="closeModal('ch-modal')">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="field form-full">
+        <label>Nosaukums</label>
+        <input type="text" id="ch-title" placeholder="Nedēļas macaronu čempions">
+      </div>
+      <div class="field form-full">
+        <label>Apraksts</label>
+        <textarea id="ch-desc" placeholder="Sakrāj vairāk rozā macaronu nekā jebkurš cits!"></textarea>
+      </div>
+      <div class="field">
+        <label>Sākums</label>
+        <input type="datetime-local" id="ch-start">
+      </div>
+      <div class="field">
+        <label>Beigas</label>
+        <input type="datetime-local" id="ch-end">
+      </div>
+      <div class="field">
+        <label>Mērķa tips</label>
+        <select id="ch-goal-type" onchange="toggleGoalColor()">
+          <option value="score_endless">Punkti bezgalīgajā</option>
+          <option value="levels_completed">Izpildīti līmeņi</option>
+          <option value="color_collected">Krāsas macaroni</option>
+          <option value="min_moves_score">Punkti ar min. gājieniem</option>
+          <option value="fewest_moves_win">Līmeņi ar min. gājieniem</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Mērķa vērtība</label>
+        <input type="number" id="ch-goal-val" placeholder="1000">
+      </div>
+      <div class="field" id="ch-color-field" style="display:none">
+        <label>Krāsas hex (tikai color_collected)</label>
+        <input type="text" id="ch-goal-color" placeholder="#E8A4B8">
+      </div>
+      <div class="field">
+        <label>Uzvarētāju skaits</label>
+        <input type="number" id="ch-winners" value="1" min="1">
+      </div>
+      <div class="field form-full">
+        <label>Balvas apraksts (uzvarētājam)</label>
+        <textarea id="ch-reward-desc" placeholder="Bezmaksas 12 macaronu kastīte pēc izvēles"></textarea>
+      </div>
+      <div class="field">
+        <label>Uzvarētāja e-pasta temats</label>
+        <input type="text" id="ch-win-subj" placeholder="🎉 Tu uzvarēji Macaroon Garden izaicinājumā!">
+      </div>
+      <div class="field form-full">
+        <label>Uzvarētāja e-pasta teksts</label>
+        <textarea id="ch-win-body" placeholder="Sveiki! Tu esi uzvarētājs..."></textarea>
+      </div>
+      <div class="field form-full">
+        <div class="toggle-row">
+          <span class="toggle-label">Sūtīt e-pastu visiem dalībniekiem</span>
+          <label class="toggle"><input type="checkbox" id="ch-notify-all"><span class="toggle-sl"></span></label>
+        </div>
+      </div>
+      <div class="field">
+        <label>Dalībnieku e-pasta temats</label>
+        <input type="text" id="ch-part-subj" placeholder="Paldies par dalību!">
+      </div>
+      <div class="field form-full">
+        <label>Dalībnieku e-pasta teksts</label>
+        <textarea id="ch-part-body" placeholder="Paldies, ka spēlēji! Šeit ir īpašs piedāvājums..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('ch-modal')">Atcelt</button>
+      <button class="btn btn-primary" onclick="saveChallenge()">Saglabāt</button>
+    </div>
+  </div>
+</div>
+
+<!-- Ad Modal -->
+<div class="modal-bg" id="ad-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="ad-modal-title">Jauna reklāma</div>
+      <button class="modal-close" onclick="closeModal('ad-modal')">✕</button>
+    </div>
+    <div id="ad-preview-wrap"></div>
+    <div class="form-grid">
+      <div class="field form-full">
+        <label>Virsraksts</label>
+        <input type="text" id="ad-title" placeholder="🌸 Pasūtī savu kastīti!" oninput="updateAdPreview()">
+      </div>
+      <div class="field form-full">
+        <label>Teksts</label>
+        <textarea id="ad-body" placeholder="Svaigi cepti macaroni. Piegāde Rīgā 24h." oninput="updateAdPreview()"></textarea>
+      </div>
+      <div class="field">
+        <label>Attēla URL</label>
+        <input type="url" id="ad-image" placeholder="https://...">
+      </div>
+      <div class="field">
+        <label>CTA poga teksts</label>
+        <input type="text" id="ad-cta" placeholder="Pasūtīt tagad" oninput="updateAdPreview()">
+      </div>
+      <div class="field form-full">
+        <label>CTA saite</label>
+        <input type="text" id="ad-url" placeholder="index.html#box">
+      </div>
+      <div class="field">
+        <label>Rādīt pēc līmeņa #</label>
+        <input type="number" id="ad-after-level" placeholder="0 = no sākuma">
+      </div>
+      <div class="field">
+        <label>Rādīt ik pēc N līmeņiem</label>
+        <input type="number" id="ad-every-n" value="3">
+      </div>
+      <div class="field">
+        <label>Aktīvs no</label>
+        <input type="datetime-local" id="ad-from">
+      </div>
+      <div class="field">
+        <label>Aktīvs līdz</label>
+        <input type="datetime-local" id="ad-until">
+      </div>
+      <div class="field">
+        <label>Automātiska aizvēršana (sek)</label>
+        <input type="number" id="ad-duration" value="5">
+      </div>
+      <div class="field">
+        <div class="toggle-row">
+          <span class="toggle-label">Aktīva</span>
+          <label class="toggle"><input type="checkbox" id="ad-active" checked><span class="toggle-sl"></span></label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('ad-modal')">Atcelt</button>
+      <button class="btn btn-primary" onclick="saveAd()">Saglabāt</button>
+    </div>
+  </div>
+</div>
+
+<!-- Discount Modal -->
+<div class="modal-bg" id="disc-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Atlaižu kods</div>
+      <button class="modal-close" onclick="closeModal('disc-modal')">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="field">
+        <label>Kods</label>
+        <input type="text" id="dc-code" placeholder="SUMMER20" style="text-transform:uppercase">
+      </div>
+      <div class="field">
+        <label>Tips</label>
+        <select id="dc-type">
+          <option value="percent">Procenti (%)</option>
+          <option value="fixed">Fiksēta summa (€)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Vērtība</label>
+        <input type="number" id="dc-value" placeholder="20">
+      </div>
+      <div class="field">
+        <label>Min. pasūtījums (€)</label>
+        <input type="number" id="dc-min" value="0">
+      </div>
+      <div class="field">
+        <label>Max lietojumu skaits</label>
+        <input type="number" id="dc-max-uses" placeholder="Atstāj tukšu = neierobežots">
+      </div>
+      <div class="field">
+        <label>Derīgs līdz</label>
+        <input type="datetime-local" id="dc-until">
+      </div>
+      <div class="field form-full">
+        <label>Piezīme (admin)</label>
+        <input type="text" id="dc-desc" placeholder="Vasaras kampaņa 2025">
+      </div>
+      <div class="field form-full">
+        <div class="toggle-row">
+          <span class="toggle-label">Aktīvs</span>
+          <label class="toggle"><input type="checkbox" id="dc-active" checked><span class="toggle-sl"></span></label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('disc-modal')">Atcelt</button>
+      <button class="btn btn-primary" onclick="saveDiscount()">Saglabāt</button>
+    </div>
+  </div>
+</div>
+
+<!-- Generic Product Modal -->
+<div class="modal-bg" id="prod-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="prod-modal-title">Produkts</div>
+      <button class="modal-close" onclick="closeModal('prod-modal')">✕</button>
+    </div>
+    <div id="prod-modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('prod-modal')">Atcelt</button>
+      <button class="btn btn-primary" onclick="saveProd()">Saglabāt</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── SUPABASE ──
+const SB_URL = 'https://ibnvqljclchzlbvfwugj.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlibnZxbGpjbGNoemxidmZ3dWdqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyNDM4MjIsImV4cCI6MjA4NjgxOTgyMn0.oQqSvLbbDcWDpgJdDYde11sd6SX96snBIYs1FzfcCvo';
+const sb = window.supabase.createClient(SB_URL, SB_KEY);
+
+// ── AUTH ──
+let currentUser = null;
+async function initAuth() {
+  const { data: { session } } = await sb.auth.getSession();
+  if(session) { currentUser = session.user; showAdmin(); }
+  else document.getElementById('authScreen').style.display = 'flex';
+  sb.auth.onAuthStateChange((_, s) => {
+    currentUser = s?.user || null;
+    if(currentUser) showAdmin(); else location.reload();
+  });
+}
+async function doLogin() {
+  const email = document.getElementById('authEmail').value;
+  const pass = document.getElementById('authPass').value;
+  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if(error) document.getElementById('authError').textContent = 'Nepareizs e-pasts vai parole';
+}
+async function doLogout() { await sb.auth.signOut(); location.reload(); }
+function showAdmin() {
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('sbUser').textContent = currentUser?.email || '';
+  loadDashboard();
+  initVideo();
+}
+
+// ── NAV ──
+let currentPanel = 'dashboard';
+const panelLoaders = {
+  dashboard: loadDashboard,
+  challenges: loadChallenges,
+  leaderboard: loadLeaderboard,
+  ads: loadAds,
+  products: () => prodTab('boxes'),
+  discounts: loadDiscounts,
+  orders: loadOrders,
+  video: () => {},
+  emails: loadEmails,
+};
+const panelTitles = {
+  dashboard:'Pārskats', challenges:'Izaicinājumi', leaderboard:'Līderu saraksts',
+  ads:'Spēles reklāmas', products:'Produkti', discounts:'Atlaižu kodi',
+  orders:'Pasūtījumi', video:'Video ģenerātors', emails:'E-pasta žurnāls'
+};
+function nav(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sb-link').forEach(l => l.classList.remove('active'));
+  document.getElementById('p-'+id).classList.add('active');
+  document.querySelector(`.sb-link[onclick="nav('${id}')"]`).classList.add('active');
+  document.getElementById('topbarTitle').textContent = panelTitles[id];
+  currentPanel = id;
+  setupTopbarActions(id);
+  if(panelLoaders[id]) panelLoaders[id]();
+}
+function setupTopbarActions(id) {
+  const acts = document.getElementById('topbarActions');
+  const btns = {
+    challenges: `<button class="btn btn-primary btn-sm" onclick="openChallengeModal()">+ Izaicinājums</button>`,
+    ads: `<button class="btn btn-primary btn-sm" onclick="openAdModal()">+ Reklāma</button>`,
+    discounts: `<button class="btn btn-primary btn-sm" onclick="openDiscountModal()">+ Kods</button>`,
+  };
+  acts.innerHTML = btns[id] || '';
+}
+
+// ── TOAST ──
+function toast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show ' + type;
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ── MODAL ──
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ── HELPERS ──
+function fmt(v) { return v == null ? '—' : v; }
+function fmtDate(d) { return d ? new Date(d).toLocaleDateString('lv-LV') : '—'; }
+function fmtPrice(v) { return v != null ? '€' + parseFloat(v).toFixed(2) : '—'; }
+function badge(text, cls) { return `<span class="badge badge-${cls}">${text}</span>`; }
+
+// ── DASHBOARD ──
+async function loadDashboard() {
+  const [{ count: players }, { count: orders }, { data: challenges }] = await Promise.all([
+    sb.from('game_scores').select('*', { count:'exact', head:true }),
+    sb.from('orders').select('*', { count:'exact', head:true }),
+    sb.from('challenges').select('*').eq('active', true).gte('ends_at', new Date().toISOString()),
+  ]);
+  document.getElementById('db-players').textContent = players ?? '—';
+  document.getElementById('db-orders').textContent = orders ?? '—';
+  document.getElementById('db-challenges').textContent = challenges?.length ?? '—';
+
+  const chList = document.getElementById('db-challenge-list');
+  if(!challenges?.length) { chList.innerHTML = '<div style="color:#7a5a48;font-size:.85rem">Nav aktīvu izaicinājumu</div>'; }
+  else chList.innerHTML = challenges.slice(0,3).map(c => `
+    <div style="padding:.6rem 0;border-bottom:1px solid var(--sand)">
+      <div style="font-weight:600;font-size:.85rem">${c.title}</div>
+      <div style="font-size:.72rem;color:#7a5a48">Beidzas: ${fmtDate(c.ends_at)}</div>
+    </div>`).join('');
+
+  const { data: recentOrders } = await sb.from('orders').select('*').order('created_at', { ascending:false }).limit(5);
+  const orList = document.getElementById('db-order-list');
+  if(!recentOrders?.length) { orList.innerHTML = '<div style="color:#7a5a48;font-size:.85rem">Nav pasūtījumu</div>'; }
+  else orList.innerHTML = recentOrders.map(o => `
+    <div style="padding:.6rem 0;border-bottom:1px solid var(--sand);display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-weight:600;font-size:.85rem">${o.customer_name || 'Anonīms'}</div>
+        <div style="font-size:.72rem;color:#7a5a48">${fmtDate(o.created_at)}</div>
+      </div>
+      <div>${fmtPrice(o.total)}</div>
+    </div>`).join('');
+}
+
+// ── CHALLENGES ──
+let editingChallengeId = null;
+async function loadChallenges() {
+  const { data } = await sb.from('challenges').select('*').order('created_at', { ascending:false });
+  const el = document.getElementById('ch-list');
+  if(!data?.length) { el.innerHTML = '<div class="card" style="text-align:center;color:#7a5a48">Nav izaicinājumu. <button class="btn btn-primary btn-sm" onclick="openChallengeModal()">Izveidot pirmo</button></div>'; return; }
+  const goalLabels = { score_endless:'Punkti bezgalīgajā', levels_completed:'Izpildīti līmeņi', color_collected:'Krāsas macaroni', min_moves_score:'Punkti/min. gājieni', fewest_moves_win:'Līmeņi/min. gājieni' };
+  const now = new Date();
+  el.innerHTML = data.map(c => {
+    const active = c.active && new Date(c.ends_at) > now && new Date(c.starts_at) <= now;
+    const upcoming = new Date(c.starts_at) > now;
+    const st = active ? badge('Aktīvs','green') : upcoming ? badge('Gaidāms','blue') : badge('Beidzies','red');
+    return `<div class="ch-card" style="border-color:${active?'var(--rose-d)':upcoming?'var(--gold)':'#ccc'}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between">
+        <div class="ch-title">${c.title}</div>${st}
+      </div>
+      <div class="ch-meta">
+        <span>📅 ${fmtDate(c.starts_at)} – ${fmtDate(c.ends_at)}</span>
+        <span>🎯 ${goalLabels[c.goal_type] || c.goal_type}: ${c.goal_value}</span>
+        <span>🏆 Top ${c.winner_count} uzvarētāji</span>
+      </div>
+      ${c.description ? `<div style="font-size:.82rem;color:#5a3d2e;margin-bottom:.7rem">${c.description}</div>` : ''}
+      <div class="ch-footer">
+        <div style="display:flex;gap:.5rem">
+          <button class="btn btn-ghost btn-sm" onclick="editChallenge('${c.id}')">✏️ Labot</button>
+          <button class="btn btn-success btn-sm" onclick="announceWinners('${c.id}')">🏆 Uzvarētāji</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteChallenge('${c.id}')">🗑️</button>
+        </div>
+        <label class="toggle" title="Aktīvs"><input type="checkbox" ${c.active?'checked':''} onchange="toggleChallenge('${c.id}',this.checked)"><span class="toggle-sl"></span></label>
+      </div>
+    </div>`;
+  }).join('');
+}
+function openChallengeModal(data=null) {
+  editingChallengeId = data?.id || null;
+  document.getElementById('ch-modal-title').textContent = data ? 'Labot izaicinājumu' : 'Jauns izaicinājums';
+  ['title','desc','goal-val','goal-color','win-subj','win-body','part-subj','part-body'].forEach(k => {
+    const el = document.getElementById('ch-'+k);
+    if(el) el.value = data?.[k.replace('-','_')] ?? '';
+  });
+  if(data) {
+    document.getElementById('ch-goal-type').value = data.goal_type || 'score_endless';
+    document.getElementById('ch-winners').value = data.winner_count || 1;
+    document.getElementById('ch-notify-all').checked = data.notify_all_participants || false;
+    if(data.starts_at) document.getElementById('ch-start').value = data.starts_at.slice(0,16);
+    if(data.ends_at) document.getElementById('ch-end').value = data.ends_at.slice(0,16);
+  }
+  toggleGoalColor();
+  openModal('ch-modal');
+}
+function toggleGoalColor() {
+  document.getElementById('ch-color-field').style.display =
+    document.getElementById('ch-goal-type').value === 'color_collected' ? 'flex' : 'none';
+}
+async function editChallenge(id) {
+  const { data } = await sb.from('challenges').select('*').eq('id',id).single();
+  openChallengeModal(data);
+}
+async function saveChallenge() {
+  const payload = {
+    title: document.getElementById('ch-title').value,
+    description: document.getElementById('ch-desc').value,
+    starts_at: document.getElementById('ch-start').value,
+    ends_at: document.getElementById('ch-end').value,
+    goal_type: document.getElementById('ch-goal-type').value,
+    goal_value: parseInt(document.getElementById('ch-goal-val').value),
+    goal_color: document.getElementById('ch-goal-color').value || null,
+    winner_count: parseInt(document.getElementById('ch-winners').value) || 1,
+    notify_all_participants: document.getElementById('ch-notify-all').checked,
+    winner_email_subject: document.getElementById('ch-win-subj').value,
+    winner_email_body: document.getElementById('ch-win-body').value,
+    participant_email_subject: document.getElementById('ch-part-subj').value,
+    participant_email_body: document.getElementById('ch-part-body').value,
+    active: true,
+  };
+  const { error } = editingChallengeId
+    ? await sb.from('challenges').update(payload).eq('id', editingChallengeId)
+    : await sb.from('challenges').insert(payload);
+  if(error) { toast('Kļūda: ' + error.message, 'error'); return; }
+  toast('Saglabāts!', 'success');
+  closeModal('ch-modal');
+  loadChallenges();
+}
+async function toggleChallenge(id, val) {
+  await sb.from('challenges').update({ active: val }).eq('id', id);
+  toast(val ? 'Aktivizēts' : 'Deaktivizēts');
+}
+async function deleteChallenge(id) {
+  if(!confirm('Dzēst izaicinājumu?')) return;
+  await sb.from('challenges').delete().eq('id', id);
+  toast('Dzēsts', 'success');
+  loadChallenges();
+}
+async function announceWinners(challengeId) {
+  const { data: ch } = await sb.from('challenges').select('*').eq('id', challengeId).single();
+  const { data: participants } = await sb.from('challenge_participants')
+    .select('*, profile:user_id(email)').eq('challenge_id', challengeId)
+    .order('current_value', { ascending: false }).limit(ch.winner_count);
+  if(!participants?.length) { toast('Nav dalībnieku', 'error'); return; }
+  // Log emails to send
+  const emails = participants.map(p => ({
+    to_email: p.profile?.email || 'unknown',
+    subject: ch.winner_email_subject || '🎉 Tu uzvarēji!',
+    type: 'winner',
+    challenge_id: challengeId,
+    status: 'pending',
+  }));
+  await sb.from('email_log').insert(emails);
+  toast(`${emails.length} uzvarētāju e-pasti ievietoti rindā!`, 'success');
+}
+
+// ── LEADERBOARD ──
+let lbData = [];
+async function loadLeaderboard() {
+  const { data } = await sb.from('game_scores').select('*').order('score', { ascending:false }).limit(100);
+  lbData = data || [];
+  renderLb(lbData);
+}
+function renderLb(data) {
+  document.getElementById('lb-body').innerHTML = data.map((r,i) => `
+    <tr>
+      <td><b>${i+1}</b></td>
+      <td>${r.display_name || 'Anonīms'}</td>
+      <td><b>${r.score}</b></td>
+      <td>${r.levels_completed ?? '—'}</td>
+      <td>${r.total_moves ?? '—'}</td>
+    </tr>`).join('');
+}
+function filterLb(q) {
+  renderLb(q ? lbData.filter(r => (r.display_name||'').toLowerCase().includes(q.toLowerCase())) : lbData);
+}
+
+// ── ADS ──
+let editingAdId = null;
+async function loadAds() {
+  const { data } = await sb.from('game_ads').select('*').order('sort_order');
+  const el = document.getElementById('ads-list');
+  if(!data?.length) { el.innerHTML = '<div class="card" style="text-align:center;color:#7a5a48">Nav reklāmu.</div>'; return; }
+  el.innerHTML = '<div class="grid-2">' + data.map(a => `
+    <div class="card">
+      <div class="ad-preview">
+        ${a.image_url ? `<img src="${a.image_url}" style="width:100%;border-radius:8px;margin-bottom:.5rem;max-height:120px;object-fit:cover">` : ''}
+        <div class="ad-preview-title">${a.title}</div>
+        ${a.body ? `<div class="ad-preview-body">${a.body}</div>` : ''}
+        ${a.cta_text ? `<span class="ad-preview-cta">${a.cta_text}</span>` : ''}
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:.8rem">
+        <div style="font-size:.72rem;color:#7a5a48">
+          Ik pēc ${a.show_every_n_levels} līmeņiem · ${a.duration_seconds}s
+          ${a.active_until ? `· Līdz ${fmtDate(a.active_until)}` : ''}
+        </div>
+        <div style="display:flex;gap:.4rem;align-items:center">
+          ${a.active ? badge('Aktīva','green') : badge('Neaktīva','red')}
+          <button class="btn btn-ghost btn-icon" onclick="editAd('${a.id}')">✏️</button>
+          <button class="btn btn-danger btn-icon" onclick="deleteAd('${a.id}')">🗑️</button>
+        </div>
+      </div>
+    </div>`).join('') + '</div>';
+}
+function openAdModal(data=null) {
+  editingAdId = data?.id || null;
+  document.getElementById('ad-modal-title').textContent = data ? 'Labot reklāmu' : 'Jauna reklāma';
+  ['title','body','image','cta','url'].forEach(k => {
+    document.getElementById('ad-'+k).value = data?.[k === 'url' ? 'cta_url' : k === 'cta' ? 'cta_text' : k] ?? '';
+  });
+  if(data) {
+    document.getElementById('ad-after-level').value = data.show_after_level ?? '';
+    document.getElementById('ad-every-n').value = data.show_every_n_levels ?? 3;
+    document.getElementById('ad-duration').value = data.duration_seconds ?? 5;
+    document.getElementById('ad-active').checked = data.active ?? true;
+    if(data.active_from) document.getElementById('ad-from').value = data.active_from.slice(0,16);
+    if(data.active_until) document.getElementById('ad-until').value = data.active_until.slice(0,16);
+  }
+  updateAdPreview();
+  openModal('ad-modal');
+}
+function updateAdPreview() {
+  const title = document.getElementById('ad-title').value;
+  const body = document.getElementById('ad-body').value;
+  const cta = document.getElementById('ad-cta').value;
+  document.getElementById('ad-preview-wrap').innerHTML = `
+    <div class="ad-preview" style="margin-bottom:1rem">
+      <div class="ad-preview-title">${title || 'Virsraksts'}</div>
+      ${body ? `<div class="ad-preview-body">${body}</div>` : ''}
+      ${cta ? `<span class="ad-preview-cta">${cta}</span>` : ''}
+    </div>`;
+}
+async function editAd(id) {
+  const { data } = await sb.from('game_ads').select('*').eq('id',id).single();
+  openAdModal(data);
+}
+async function saveAd() {
+  const payload = {
+    title: document.getElementById('ad-title').value,
+    body: document.getElementById('ad-body').value,
+    image_url: document.getElementById('ad-image').value || null,
+    cta_text: document.getElementById('ad-cta').value,
+    cta_url: document.getElementById('ad-url').value,
+    show_after_level: parseInt(document.getElementById('ad-after-level').value) || 0,
+    show_every_n_levels: parseInt(document.getElementById('ad-every-n').value) || 3,
+    duration_seconds: parseInt(document.getElementById('ad-duration').value) || 5,
+    active: document.getElementById('ad-active').checked,
+    active_from: document.getElementById('ad-from').value || null,
+    active_until: document.getElementById('ad-until').value || null,
+  };
+  const { error } = editingAdId
+    ? await sb.from('game_ads').update(payload).eq('id', editingAdId)
+    : await sb.from('game_ads').insert(payload);
+  if(error) { toast('Kļūda: ' + error.message, 'error'); return; }
+  toast('Saglabāts!', 'success');
+  closeModal('ad-modal');
+  loadAds();
+}
+async function deleteAd(id) {
+  if(!confirm('Dzēst reklāmu?')) return;
+  await sb.from('game_ads').delete().eq('id', id);
+  toast('Dzēsts', 'success');
+  loadAds();
+}
+
+// ── PRODUCTS ──
+let currentProdTab = 'boxes';
+let editingProdId = null;
+const prodConfig = {
+  boxes:   { table:'box_sizes',    title:'Kastīšu izmērs', fields:[{k:'name',l:'Nosaukums'},{k:'piece_count',l:'Gab. skaits',t:'number'},{k:'base_price',l:'Cena (€)',t:'number'},{k:'active',l:'Aktīvs',t:'toggle'},{k:'sort_order',l:'Kārtība',t:'number'}] },
+  colors:  { table:'box_colors',   title:'Kastītes krāsa', fields:[{k:'name',l:'Nosaukums'},{k:'hex',l:'Krāsa (hex)'},{k:'image_url',l:'Attēla URL'},{k:'extra_price',l:'Papildcena (€)',t:'number'},{k:'active',l:'Aktīvs',t:'toggle'},{k:'sort_order',l:'Kārtība',t:'number'}] },
+  ribbons: { table:'ribbon_colors',title:'Lentītes krāsa', fields:[{k:'name',l:'Nosaukums'},{k:'hex',l:'Krāsa (hex)'},{k:'active',l:'Aktīvs',t:'toggle'},{k:'sort_order',l:'Kārtība',t:'number'}] },
+  addons:  { table:'addons',       title:'Papildpakalpojums', fields:[{k:'name',l:'Nosaukums'},{k:'description',l:'Apraksts',t:'textarea'},{k:'price',l:'Cena (€)',t:'number'},{k:'image_url',l:'Attēla URL'},{k:'active',l:'Aktīvs',t:'toggle'},{k:'sort_order',l:'Kārtība',t:'number'}] },
+  flavors: { table:'flavors',      title:'Garša', fields:[{k:'key',l:'Atslēga (rose/lemon...)'},{k:'name',l:'Nosaukums'},{k:'emoji',l:'Emoji'},{k:'description',l:'Apraksts',t:'textarea'},{k:'color_bg',l:'Fona krāsa (hex)'},{k:'color_text',l:'Teksta krāsa (hex)'},{k:'active',l:'Aktīvs',t:'toggle'},{k:'sort_order',l:'Kārtība',t:'number'}] },
+};
+async function prodTab(tab) {
+  currentProdTab = tab;
+  document.querySelectorAll('.prod-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  const cfg = prodConfig[tab];
+  const { data } = await sb.from(cfg.table).select('*').order('sort_order');
+  const el = document.getElementById('prod-content');
+  el.innerHTML = `<div class="tbl-wrap"><div class="tbl-header"><div class="tbl-title">${cfg.title}i</div><button class="btn btn-primary btn-sm" onclick="openProdModal()">+ Pievienot</button></div>
+    <table><thead><tr><th>Nosaukums</th>${cfg.fields.some(f=>f.k==='base_price'||f.k==='price')?'<th>Cena</th>':''}<th>Statuss</th><th></th></tr></thead>
+    <tbody>${(data||[]).map(r=>`<tr>
+      <td>${r.name || r.key}${r.emoji?' '+r.emoji:''}${r.hex?` <span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:${r.hex};vertical-align:middle;margin-left:4px"></span>`:''}</td>
+      ${cfg.fields.some(f=>f.k==='base_price')?`<td>${fmtPrice(r.base_price)}</td>`:''}
+      ${cfg.fields.some(f=>f.k==='price')?`<td>${fmtPrice(r.price)}</td>`:''}
+      <td>${r.active ? badge('Aktīvs','green') : badge('Neaktīvs','red')}</td>
+      <td><div style="display:flex;gap:.3rem">
+        <button class="btn btn-ghost btn-sm" onclick="editProd('${r.id}')">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteProd('${r.id}')">🗑️</button>
+      </div></td></tr>`).join('')}</tbody></table></div>`;
+}
+function openProdModal(data=null) {
+  editingProdId = data?.id || null;
+  const cfg = prodConfig[currentProdTab];
+  document.getElementById('prod-modal-title').textContent = (data ? 'Labot' : 'Jauns') + ': ' + cfg.title;
+  document.getElementById('prod-modal-body').innerHTML = `<div class="form-grid">${cfg.fields.map(f => {
+    if(f.t === 'toggle') return `<div class="field form-full"><div class="toggle-row"><span class="toggle-label">${f.l}</span><label class="toggle"><input type="checkbox" id="pf-${f.k}" ${data?.[f.k]!==false?'checked':''}><span class="toggle-sl"></span></label></div></div>`;
+    if(f.t === 'textarea') return `<div class="field form-full"><label>${f.l}</label><textarea id="pf-${f.k}">${data?.[f.k]||''}</textarea></div>`;
+    return `<div class="field"><label>${f.l}</label><input type="${f.t||'text'}" id="pf-${f.k}" value="${data?.[f.k]??''}"></div>`;
+  }).join('')}</div>`;
+  openModal('prod-modal');
+}
+async function editProd(id) {
+  const { data } = await sb.from(prodConfig[currentProdTab].table).select('*').eq('id',id).single();
+  openProdModal(data);
+}
+async function saveProd() {
+  const cfg = prodConfig[currentProdTab];
+  const payload = {};
+  cfg.fields.forEach(f => {
+    const el = document.getElementById('pf-'+f.k);
+    if(!el) return;
+    payload[f.k] = f.t === 'toggle' ? el.checked : f.t === 'number' ? parseFloat(el.value) || 0 : el.value;
+  });
+  const { error } = editingProdId
+    ? await sb.from(cfg.table).update(payload).eq('id', editingProdId)
+    : await sb.from(cfg.table).insert(payload);
+  if(error) { toast('Kļūda: ' + error.message, 'error'); return; }
+  toast('Saglabāts!', 'success');
+  closeModal('prod-modal');
+  prodTab(currentProdTab);
+}
+async function deleteProd(id) {
+  if(!confirm('Dzēst?')) return;
+  await sb.from(prodConfig[currentProdTab].table).delete().eq('id', id);
+  toast('Dzēsts', 'success');
+  prodTab(currentProdTab);
+}
+
+// ── DISCOUNTS ──
+let editingDiscId = null;
+async function loadDiscounts() {
+  const { data } = await sb.from('discount_codes').select('*').order('created_at', { ascending:false });
+  document.getElementById('disc-body').innerHTML = (data||[]).map(d => `<tr>
+    <td><b>${d.code}</b></td>
+    <td>${d.type === 'percent' ? 'Procenti' : 'Fiksēts'}</td>
+    <td><b>${d.type === 'percent' ? d.value + '%' : '€' + d.value}</b></td>
+    <td>${d.used_count} ${d.max_uses ? '/ ' + d.max_uses : ''}</td>
+    <td>${d.valid_until ? fmtDate(d.valid_until) : '∞'}</td>
+    <td>${d.active ? badge('Aktīvs','green') : badge('Neaktīvs','red')}</td>
+    <td><div style="display:flex;gap:.3rem">
+      <button class="btn btn-ghost btn-sm" onclick="editDiscount('${d.id}')">✏️</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteDiscount('${d.id}')">🗑️</button>
+    </div></td></tr>`).join('');
+}
+function openDiscountModal(data=null) {
+  editingDiscId = data?.id || null;
+  document.getElementById('dc-code').value = data?.code || '';
+  document.getElementById('dc-type').value = data?.type || 'percent';
+  document.getElementById('dc-value').value = data?.value || '';
+  document.getElementById('dc-min').value = data?.min_order || 0;
+  document.getElementById('dc-max-uses').value = data?.max_uses || '';
+  document.getElementById('dc-desc').value = data?.description || '';
+  document.getElementById('dc-active').checked = data?.active ?? true;
+  if(data?.valid_until) document.getElementById('dc-until').value = data.valid_until.slice(0,16);
+  openModal('disc-modal');
+}
+async function editDiscount(id) {
+  const { data } = await sb.from('discount_codes').select('*').eq('id',id).single();
+  openDiscountModal(data);
+}
+async function saveDiscount() {
+  const payload = {
+    code: document.getElementById('dc-code').value.toUpperCase(),
+    type: document.getElementById('dc-type').value,
+    value: parseFloat(document.getElementById('dc-value').value),
+    min_order: parseFloat(document.getElementById('dc-min').value) || 0,
+    max_uses: parseInt(document.getElementById('dc-max-uses').value) || null,
+    valid_until: document.getElementById('dc-until').value || null,
+    description: document.getElementById('dc-desc').value,
+    active: document.getElementById('dc-active').checked,
+  };
+  const { error } = editingDiscId
+    ? await sb.from('discount_codes').update(payload).eq('id', editingDiscId)
+    : await sb.from('discount_codes').insert(payload);
+  if(error) { toast('Kļūda: ' + error.message, 'error'); return; }
+  toast('Saglabāts!', 'success');
+  closeModal('disc-modal');
+  loadDiscounts();
+}
+async function deleteDiscount(id) {
+  if(!confirm('Dzēst kodu?')) return;
+  await sb.from('discount_codes').delete().eq('id', id);
+  toast('Dzēsts', 'success');
+  loadDiscounts();
+}
+
+// ── ORDERS ──
+let ordersFilter = '';
+async function loadOrders() {
+  let q = sb.from('orders').select('*').order('created_at', { ascending:false });
+  if(ordersFilter) q = q.eq('status', ordersFilter);
+  const { data } = await q;
+  const statusBadge = { pending: badge('Gaida','gold'), confirmed: badge('Apstiprināts','green'), delivered: badge('Piegādāts','blue') };
+  document.getElementById('orders-body').innerHTML = (data||[]).map(o => `<tr>
+    <td style="font-size:.72rem;opacity:.6">${o.id.slice(0,8)}...</td>
+    <td><div style="font-weight:600">${o.customer_name||'—'}</div><div style="font-size:.72rem;color:#7a5a48">${o.customer_email||''}</div></td>
+    <td style="font-size:.82rem">${o.flavors?.length || 0} garša(s)</td>
+    <td><b>${fmtPrice(o.total)}</b></td>
+    <td>${statusBadge[o.status] || o.status}</td>
+    <td style="font-size:.72rem">${fmtDate(o.created_at)}</td>
+    <td><select style="padding:.3rem .5rem;border-radius:6px;border:1px solid var(--sand);font-size:.72rem" onchange="updateOrderStatus('${o.id}',this.value)">
+      <option ${o.status==='pending'?'selected':''} value="pending">Gaida</option>
+      <option ${o.status==='confirmed'?'selected':''} value="confirmed">Apstiprināts</option>
+      <option ${o.status==='delivered'?'selected':''} value="delivered">Piegādāts</option>
+    </select></td></tr>`).join('');
+}
+function filterOrders(v) { ordersFilter = v; loadOrders(); }
+async function updateOrderStatus(id, status) {
+  await sb.from('orders').update({ status }).eq('id', id);
+  toast('Statuss atjaunināts', 'success');
+}
+
+// ── EMAILS ──
+async function loadEmails() {
+  const { data } = await sb.from('email_log').select('*').order('created_at', { ascending:false }).limit(100);
+  const statusBadge = { pending: badge('Rindā','gold'), sent: badge('Nosūtīts','green'), failed: badge('Kļūda','red') };
+  document.getElementById('email-body').innerHTML = (data||[]).map(e => `<tr>
+    <td>${e.to_email}</td>
+    <td>${badge(e.type||'—','blue')}</td>
+    <td style="font-size:.82rem">${e.subject||'—'}</td>
+    <td>${statusBadge[e.status] || e.status}</td>
+    <td style="font-size:.72rem">${e.sent_at ? fmtDate(e.sent_at) : '—'}</td></tr>`).join('');
+}
+
+// ── VIDEO ──
+const VF = { rose:{name:'Rozā & Aveņu',emoji:'🌹',bg:['#F2C4D4','#E8A4B8','#C97A96'],accent:'#C97A96',text:'#4a0f28',orbs:['#F2C4D4','#E8A4B8','#C97A96','#F7D6E4']},lavender:{name:'Lavandas',emoji:'💜',bg:['#D4C4E8','#C4B5D4','#9B86C2'],accent:'#9B86C2',text:'#2d1560',orbs:['#D4C4E8','#C4B5D4','#9B86C2','#E0D4F0']},mint:{name:'Piparmētru',emoji:'🌿',bg:['#C4DFC8','#A8D4B0','#6BAF78'],accent:'#6BAF78',text:'#1a4228',orbs:['#C4DFC8','#A8D4B0','#6BAF78','#D8EED8']},chocolate:{name:'Šokolādes',emoji:'🍫',bg:['#D4A87A','#C4956A','#8B5E3C'],accent:'#8B5E3C',text:'#3a1800',orbs:['#D4A87A','#C4956A','#8B5E3C','#E0C09A']},lemon:{name:'Citrona',emoji:'🍋',bg:['#EEEE70','#E8E840','#C8C800'],accent:'#B8A800',text:'#3a3a00',orbs:['#EEEE70','#E8E840','#C8C800','#F4F490']}};
+const VFMT = { reels:{w:1080,h:1920,fr:150,comp:'MacaronReels'}, story:{w:1080,h:1920,fr:120,comp:'MacaronStory'}, square:{w:1080,h:1080,fr:120,comp:'MacaronSquare'} };
+let vState = { flavor:'rose', fmt:'reels', anim:'float', title:'Katrs macarons —\nmākslas darbs', sub:'Svaigi cepti Rīgā · Piegāde 24h', cta:'Pasūtīt: info@macaroongarden.lv', frame:0, playing:false };
+let vAF = null, vLast = null;
+const orbs = Array.from({length:12},(_,i)=>({x:5+(i*137.5)%90,sY:110+(i*47)%40,sz:40+(i*23)%80,sp:0.4+(i*0.13)%0.6,ph:(i*1.7)%(Math.PI*2),ci:i%4,op:0.15+(i*0.07)%0.35,dl:(i*8)%40}));
+
+function initVideo() {
+  const pills = document.getElementById('v-flavors');
+  if(!pills) return;
+  pills.innerHTML = Object.entries(VF).map(([k,f])=>`<button class="fl-pill${k==='rose'?' on':''}" style="background:${f.bg[0]};color:${f.text}" onclick="vFlav('${k}',this)">${f.emoji} ${f.name.split(' ')[0]}</button>`).join('');
+  vResizeCanvas();
+  vDraw();
+  vPlay();
+}
+function vFlav(k,btn){vState.flavor=k;document.querySelectorAll('.fl-pill').forEach(b=>b.classList.remove('on'));btn.classList.add('on');vUpdateCmd();if(!vState.playing)vDraw();}
+function vFmt(k,btn){vState.fmt=k;document.querySelectorAll('.seg-btn[data-fmt]').forEach(b=>b.classList.remove('on'));btn.classList.add('on');vState.frame=0;vResizeCanvas();vUpdateCmd();if(!vState.playing)vDraw();}
+function vAnim(k,btn){vState.anim=k;document.querySelectorAll('.seg-btn:not([data-fmt])').forEach(b=>b.classList.remove('on'));btn.classList.add('on');vUpdateCmd();}
+function vUpdate(){vState.title=document.getElementById('v-title').value;vState.sub=document.getElementById('v-sub').value;vState.cta=document.getElementById('v-cta').value;vUpdateCmd();if(!vState.playing)vDraw();}
+function vUpdateCmd(){const fmt=VFMT[vState.fmt];document.getElementById('v-cmd').textContent=`npx remotion render ${fmt.comp} out/${vState.flavor}-${vState.fmt}.mp4 --props='{"flavor":"${vState.flavor}","animStyle":"${vState.anim}","title":"${vState.title.replace(/\n/g,'\\n')}","subtitle":"${vState.sub}","cta":"${vState.cta}","showLogo":true,"logoText":"Macaroon Garden"}'`;}
+function copyCmd(){navigator.clipboard.writeText(document.getElementById('v-cmd').textContent).then(()=>toast('Kopēts!','success'));}
+
+function vResizeCanvas(){
+  const fmt=VFMT[vState.fmt];
+  const outer=document.getElementById('v-canvas-outer');
+  if(!outer)return;
+  const area=outer.parentElement;
+  const aw=area.clientWidth-40,ah=area.clientHeight-40;
+  const asp=fmt.w/fmt.h;
+  let cw,ch;
+  if(aw/ah>asp){ch=Math.min(ah,560);cw=ch*asp;}else{cw=Math.min(aw,320);ch=cw/asp;}
+  const cv=document.getElementById('v-canvas');
+  cv.width=Math.round(cw);cv.height=Math.round(ch);
+  outer.style.width=cw+'px';outer.style.height=ch+'px';
+}
+
+function spSolve(fr,k=100,d=18){if(fr<=0)return 0;const w=Math.sqrt(k),dm=d/(2*w),wd=w*Math.sqrt(Math.max(0,1-dm*dm)),t=fr/30;return dm<1?1-Math.exp(-dm*w*t)*(Math.cos(wd*t)+(dm*w/wd)*Math.sin(wd*t)):1-Math.exp(-w*t)*(1+w*t);}
+function ilerp(v,a,b,c,e){return c+(e-c)*Math.max(0,Math.min(1,(v-a)/(b-a)));}
+
+function vDraw(){
+  const cv=document.getElementById('v-canvas');if(!cv)return;
+  const ctx=cv.getContext('2d');
+  const f=VF[vState.flavor],fmt=VFMT[vState.fmt];
+  const W=cv.width,H=cv.height,fr=vState.frame;
+  const sc=W/fmt.w;
+  ctx.setTransform(sc,0,0,sc,0,0);
+  const FW=fmt.w,FH=fmt.h;
+  const g=ctx.createLinearGradient(0,0,FW,FH);
+  g.addColorStop(0,f.bg[0]);g.addColorStop(.5,f.bg[1]);g.addColorStop(1,f.bg[2]);
+  ctx.fillStyle=g;ctx.fillRect(0,0,FW,FH);
+  // Orbs
+  orbs.forEach(o=>{
+    const t=Math.max(0,fr-o.dl);
+    const prog=(t*o.sp*.3)%130;
+    const yp=o.sY-prog;if(yp<-10)return;
+    const sc2=Math.min(1,spSolve(t,60,12));
+    ctx.save();ctx.globalAlpha=o.op*sc2;
+    ctx.beginPath();ctx.arc((o.x/100)*FW,(yp/100)*FH,(o.sz/1920)*FH*sc2,0,Math.PI*2);
+    ctx.fillStyle=f.orbs[o.ci];ctx.fill();ctx.restore();
+  });
+  // Overlay
+  const og=ctx.createLinearGradient(0,0,0,FH);
+  og.addColorStop(0,'rgba(0,0,0,.05)');og.addColorStop(.4,'rgba(0,0,0,0)');og.addColorStop(.65,'rgba(0,0,0,0)');og.addColorStop(1,'rgba(0,0,0,.45)');
+  ctx.fillStyle=og;ctx.fillRect(0,0,FW,FH);
+  const px=v=>(v/1920)*FH;
+  const gop=fr>fmt.fr-20?ilerp(fr,fmt.fr-20,fmt.fr,1,0):1;
+  ctx.globalAlpha=gop;
+  // Logo
+  const lsp=Math.min(1,spSolve(fr));
+  ctx.save();ctx.globalAlpha=gop*lsp;
+  ctx.beginPath();const lx=px(70),ly=px(80)+ilerp(lsp,0,1,-px(60),0);
+  ctx.roundRect(lx,ly,px(56),px(56),px(14));ctx.fillStyle='rgba(255,255,255,.28)';ctx.fill();
+  ctx.font=`${px(32)}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('🌸',lx+px(28),ly+px(28));
+  ctx.textAlign='left';ctx.textBaseline='top';ctx.font=`700 ${px(32)}px Georgia,serif`;ctx.fillStyle=f.text;
+  ctx.fillText('Macaroon Garden',lx+px(72),ly+px(4));ctx.restore();
+  // Emoji
+  const esp=Math.min(1,spSolve(Math.max(0,fr-8),80,14));
+  const erot=vState.anim==='float'?Math.sin(fr*.04)*8:0;
+  const cyb=fmt.w===fmt.h?FH*.44:FH*.50;
+  ctx.save();ctx.globalAlpha=gop;ctx.translate(FW/2,cyb);ctx.rotate(erot*Math.PI/180);ctx.scale(esp,esp);
+  const glg=ctx.createRadialGradient(0,0,0,0,0,px(280));glg.addColorStop(0,f.bg[0]+'88');glg.addColorStop(1,'transparent');
+  ctx.fillStyle=glg;ctx.beginPath();ctx.arc(0,0,px(280),0,Math.PI*2);ctx.fill();
+  ctx.font=`${fmt.w===fmt.h?px(200):px(280)}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(f.emoji,0,0);ctx.restore();
+  // Pill
+  const psp=Math.min(1,spSolve(Math.max(0,fr-22),200,20));
+  if(psp>.01){
+    ctx.save();ctx.globalAlpha=gop*psp;
+    ctx.font=`700 ${px(36)}px Georgia,serif`;
+    const tw=ctx.measureText(f.name).width,pw=tw+px(80),ph=px(56),px2=FW/2-pw/2,py2=cyb+px(180);
+    const scl=psp,cx=FW/2,cy=py2+ph/2;
+    ctx.setTransform(scl,0,0,scl,cx*(1-scl),cy*(1-scl));
+    ctx.beginPath();ctx.roundRect(px2,py2,pw,ph,ph/2);ctx.fillStyle='rgba(255,255,255,.88)';ctx.fill();
+    ctx.fillStyle=f.text;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(f.name,FW/2,py2+ph/2);
+    ctx.restore();
+  }
+  // Title
+  const tsp=Math.min(1,spSolve(Math.max(0,fr-18),90,16));
+  const bst=fmt.w===fmt.h?FH*.72:FH*.76;
+  const lh=px(fmt.w===fmt.h?72:96);
+  ctx.save();ctx.globalAlpha=gop*tsp;ctx.resetTransform();ctx.scale(sc,sc);
+  ctx.font=`700 ${px(fmt.w===fmt.h?64:88)}px Georgia,serif`;ctx.fillStyle='#fff';ctx.textAlign='left';ctx.textBaseline='top';
+  ctx.shadowColor='rgba(0,0,0,.4)';ctx.shadowBlur=px(20);
+  vState.title.split('\n').forEach((l,i)=>ctx.fillText(l,px(70),bst+ilerp(tsp,0,1,px(50),0)+i*lh));
+  ctx.restore();
+  // Sub
+  const ssp=Math.min(1,spSolve(Math.max(0,fr-28),90,16));
+  ctx.save();ctx.globalAlpha=gop*ssp*.88;ctx.resetTransform();ctx.scale(sc,sc);
+  ctx.font=`${px(fmt.w===fmt.h?28:38)}px 'DM Sans',sans-serif`;ctx.fillStyle='#fff';ctx.textAlign='left';ctx.textBaseline='top';
+  ctx.shadowBlur=px(8);ctx.shadowColor='rgba(0,0,0,.3)';
+  ctx.fillText(vState.sub,px(70),bst+vState.title.split('\n').length*lh+px(20)+ilerp(ssp,0,1,px(40),0));ctx.restore();
+  // CTA
+  const csp=Math.min(1,spSolve(Math.max(0,fr-40),90,16));
+  if(csp>.02){
+    ctx.save();ctx.globalAlpha=gop*csp;ctx.resetTransform();ctx.scale(sc,sc);
+    const by=FH-px(160);
+    ctx.beginPath();ctx.roundRect(px(70),by,FW-px(140),px(90),px(22));ctx.fillStyle='rgba(255,255,255,.88)';
+    ctx.shadowColor='rgba(0,0,0,.15)';ctx.shadowBlur=px(30);ctx.fill();ctx.shadowBlur=0;
+    ctx.fillStyle=f.text;ctx.font=`600 ${px(30)}px 'DM Sans',sans-serif`;ctx.textAlign='left';ctx.textBaseline='middle';
+    ctx.fillText(vState.cta,px(110),by+px(45));
+    ctx.beginPath();ctx.arc(FW-px(115),by+px(45),px(30),0,Math.PI*2);ctx.fillStyle=f.accent;ctx.fill();
+    ctx.fillStyle='#fff';ctx.font=`700 ${px(26)}px sans-serif`;ctx.textAlign='center';ctx.fillText('→',FW-px(115),by+px(45));
+    ctx.restore();
+  }
+  ctx.globalAlpha=1;
+  // Update timeline
+  const pct=vState.frame/fmt.fr*100;
+  const tf=document.getElementById('v-tl-fill');if(tf)tf.style.width=pct+'%';
+  const fl=document.getElementById('v-frame-lbl');if(fl)fl.textContent=(vState.frame/30).toFixed(1)+'s';
+}
+function vPlay(){vState.playing=true;document.getElementById('v-play-btn').textContent='⏸';vLast=null;vAF=requestAnimationFrame(vTick);}
+function vPause(){vState.playing=false;document.getElementById('v-play-btn').textContent='▶';if(vAF)cancelAnimationFrame(vAF);}
+function vTogglePlay(){vState.playing?vPause():vPlay();}
+function vTick(ts){if(!vLast)vLast=ts;vState.frame+=(ts-vLast)*30/1000;vLast=ts;if(vState.frame>=VFMT[vState.fmt].fr)vState.frame=0;vDraw();if(vState.playing)vAF=requestAnimationFrame(vTick);}
+function vScrub(e){const tl=document.getElementById('v-tl');const r=tl.getBoundingClientRect();const pct=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));vState.frame=pct*VFMT[vState.fmt].fr;vDraw();}
+
+window.addEventListener('resize',()=>{if(currentPanel==='video'){vResizeCanvas();if(!vState.playing)vDraw();}});
+
+// ── INIT ──
+initAuth();
+</script>
+</body>
+</html>
