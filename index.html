@@ -204,7 +204,7 @@
         },
         undefined,
         (error) => {
-          console.error('Neizdevās ielādēt macaron.glb:', error);
+          console.warn('Neizdevās ielādēt macaron.glb (pārbaudiet faila ceļu vai CORS):', error);
           const geometry = new THREE.CylinderGeometry(1.2, 1.2, 0.6, 32);
           const material = new THREE.MeshStandardMaterial({ color: 0xf472b6, roughness: 0.3 });
           macaronModel = new THREE.Mesh(geometry, material);
@@ -231,10 +231,11 @@
   <!-- React Komplektētājs, Forma un Supabase Skripts -->
   <script type="text/babel">
     const SUPABASE_URL = 'https://wgcybpijqjnlybxhofsw.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_DMqZ69LWWoEVqAClh3rFbQ_J1o4r_9f';
+    // Nomainiet šo pret savu īsto Supabase anon key (JWT formātā, kas sākas ar eyJ...)
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; 
     
     let supabaseClient = null;
-    if (window.supabase) {
+    if (window.supabase && SUPABASE_ANON_KEY.startsWith('eyJ')) {
       supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
 
@@ -325,6 +326,8 @@
               ]);
 
             if (error) throw error;
+          } else {
+            console.warn('Supabase klients nav konfigurēts ar derīgu atslēgu.');
           }
           
           setStatusMessage({ 
@@ -339,7 +342,7 @@
           console.error('Kļūda saglabājot pasūtījumu:', err);
           setStatusMessage({ 
             type: 'error', 
-            text: 'Notika kļūda nosūtot pasūtījumu. Lūdzu, mēģiniet vēlreiz vai sazinieties ar mums.' 
+            text: 'Notika kļūda nosūtot pasūtījumu. Lūdzu, pārbaudiet datubāzes savienojumu.' 
           });
         } finally {
           setLoading(false);
@@ -351,7 +354,7 @@
           {/* 1. Solis: Kastītes izmērs */}
           <div className="bg-white p-6 sm:p-10 rounded-3xl shadow-sm border border-pink-100">
             <div className="text-center max-w-xl mx-auto mb-8">
-              <span className="text-xs font-bold text-brand-600 uppercase tracking-widest bg-pink-50 px-3 py-1 rounded-full">1. Solis</span>
+              <span class="text-xs font-bold text-brand-600 uppercase tracking-widest bg-pink-50 px-3 py-1 rounded-full">1. Solis</span>
               <h2 className="text-3xl font-bold font-serif-title text-gray-900 mt-2">Izvēlieties kastītes izmēru</h2>
             </div>
             
@@ -452,8 +455,10 @@
 
             <form onSubmit={handleSubmitOrder} className="space-y-5">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Jūsu izvēlētais komplekts:</label>
+                <label htmlFor="orderSummary" className="block text-sm font-semibold text-gray-700 mb-1.5">Jūsu izvēlētais komplekts:</label>
                 <textarea 
+                  id="orderSummary"
+                  name="orderSummary"
                   readOnly 
                   rows="3"
                   value={getFlavoursSummaryText()} 
@@ -462,8 +467,10 @@
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Vārds, Uzvārds *</label>
+                <label htmlFor="customerName" className="block text-sm font-semibold text-gray-700 mb-1.5">Vārds, Uzvārds *</label>
                 <input 
+                  id="customerName"
+                  name="customerName"
                   type="text" 
                   required 
                   value={customerName} 
@@ -474,8 +481,10 @@
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Tālrunis vai E-pasts *</label>
+                <label htmlFor="contactInfo" className="block text-sm font-semibold text-gray-700 mb-1.5">Tālrunis vai E-pasts *</label>
                 <input 
+                  id="contactInfo"
+                  name="contactInfo"
                   type="text" 
                   required 
                   value={contactInfo} 
@@ -486,8 +495,10 @@
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Piezīmes (piegādes adrese vai vēlamais datums):</label>
+                <label htmlFor="notes" className="block text-sm font-semibold text-gray-700 mb-1.5">Piezīmes (piegādes adrese vai vēlamais datums):</label>
                 <input 
+                  id="notes"
+                  name="notes"
                   type="text" 
                   value={notes} 
                   onChange={(e) => setNotes(e.target.value)} 
