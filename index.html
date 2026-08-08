@@ -100,6 +100,12 @@
   <script type="text/babel">
     const { useState, useEffect, useRef } = React;
 
+    // Astoņi konfigurēti lietotāja un paroles piekļuves dati
+    const ADMIN_CREDENTIALS = {
+      username: "admin",
+      password: "password123" // Nomainiet pret vēlamo paroli
+    };
+
     const MOODS = [
       { id: 'romantic', name: 'Romantiskā', color: '#E0A9AF', bgClass: 'bg-[#FDF0F0]', macaronColor: 0xE0A9AF },
       { id: 'fresh', name: 'Svaigā', color: '#A8E6CF', bgClass: 'bg-[#E8F8F5]', macaronColor: 0xA8E6CF },
@@ -217,6 +223,12 @@
       const [formData, setFormData] = useState({ name: '', phone: '', email: '', date: '', notes: '' });
       const [showModal, setShowModal] = useState(false);
 
+      // Admin Login Stāvokļi
+      const [showLoginModal, setShowLoginModal] = useState(false);
+      const [loginUser, setLoginUser] = useState('');
+      const [loginPass, setLoginPass] = useState('');
+      const [loginError, setLoginError] = useState('');
+
       const addItem = (flavor) => {
         if (boxItems.length >= selectedBoxSize) return;
         setBoxItems(prev => [...prev, flavor]);
@@ -251,6 +263,17 @@
         setShowModal(true);
       };
 
+      const handleAdminLogin = (e) => {
+        e.preventDefault();
+        if (loginUser === ADMIN_CREDENTIALS.username && loginPass === ADMIN_CREDENTIALS.password) {
+          setLoginError('');
+          // Pāradresē uz admin.html
+          window.location.href = 'admin.html';
+        } else {
+          setLoginError('Nepareizs lietotājvārds vai parole!');
+        }
+      };
+
       const currentBoxConfig = BOX_SIZES.find(b => b.size === selectedBoxSize);
 
       return (
@@ -262,7 +285,7 @@
                 Macaroon <span className="text-brand-accent italic">Garden</span>
               </a>
 
-              <nav className="hidden md:flex gap-8 text-sm font-medium">
+              <nav className="hidden md:flex gap-8 text-sm font-medium items-center">
                 <a href="#hero" className="hover:text-brand-accent transition-colors">3D Makarūns</a>
                 <a href="#game-section" className="hover:text-brand-accent transition-colors">Spēle</a>
                 <a href="#flavors" className="hover:text-brand-accent transition-colors">Garšas</a>
@@ -270,7 +293,13 @@
                 <a href="#order" className="hover:text-brand-accent transition-colors">Pasūtīt</a>
               </nav>
 
-              <div className="hidden md:block">
+              <div className="hidden md:flex items-center gap-3">
+                <button 
+                  onClick={() => setShowLoginModal(true)}
+                  className="text-xs font-semibold px-3 py-2 text-gray-500 hover:text-brand-dark transition-colors"
+                >
+                  Admin Ieiet
+                </button>
                 <a href="#builder" className="bg-brand-dark text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-brand-accent transition-colors shadow-sm">
                   Salikt kasti ({boxItems.length}/{selectedBoxSize})
                 </a>
@@ -297,6 +326,12 @@
                 <a href="#flavors" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-sm font-medium">Garšas</a>
                 <a href="#builder" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-sm font-medium">Kastes salicējs</a>
                 <a href="#order" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-sm font-medium">Pasūtīt</a>
+                <button 
+                  onClick={() => { setMobileMenuOpen(false); setShowLoginModal(true); }} 
+                  className="block w-full text-left py-2 text-sm font-bold text-brand-accent"
+                >
+                  Admin Ieiet
+                </button>
               </div>
             )}
           </header>
@@ -560,6 +595,7 @@
 
           </main>
 
+          {/* VEIKSMES MODĀLAIS LOGS */}
           {showModal && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
               <div className="bg-white max-w-md w-full p-8 rounded-3xl shadow-2xl space-y-6 text-center transform animate-pop-in">
@@ -582,6 +618,64 @@
                 >
                   Aizvērt un sākt no jauna
                 </button>
+              </div>
+            </div>
+          )}
+
+          {/* ADMIN IEEJAS LOGS */}
+          {showLoginModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+              <div className="bg-white max-w-sm w-full p-8 rounded-3xl shadow-2xl space-y-6 relative transform animate-pop-in">
+                <button 
+                  onClick={() => setShowLoginModal(false)}
+                  className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-lg font-bold"
+                >
+                  ✕
+                </button>
+
+                <div className="text-center space-y-1">
+                  <h3 className="text-2xl font-serif font-bold text-brand-dark">Admin Piekļuve</h3>
+                  <p className="text-xs text-gray-500">Ievadiet datus, lai pārietu uz admin.html</p>
+                </div>
+
+                {loginError && (
+                  <div className="bg-rose-50 text-rose-600 text-xs p-3 rounded-xl border border-rose-200 text-center font-medium">
+                    {loginError}
+                  </div>
+                )}
+
+                <form onSubmit={handleAdminLogin} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Lietotājvārds</label>
+                    <input 
+                      type="text" 
+                      required 
+                      value={loginUser}
+                      onChange={e => setLoginUser(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-accent text-sm"
+                      placeholder="admin"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Parole</label>
+                    <input 
+                      type="password" 
+                      required 
+                      value={loginPass}
+                      onChange={e => setLoginPass(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-accent text-sm"
+                      placeholder="••••••••"
+                    />
+                  </div>
+
+                  <button 
+                    type="submit"
+                    className="w-full bg-brand-dark text-white py-3 rounded-xl font-bold text-sm hover:bg-brand-accent transition-colors shadow-sm"
+                  >
+                    Ieiet Admin Panelī
+                  </button>
+                </form>
               </div>
             </div>
           )}
