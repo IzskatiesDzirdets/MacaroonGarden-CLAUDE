@@ -95,49 +95,55 @@
         const container = containerRef.current;
         if (!container) return;
 
-        let width = container.clientWidth || 300;
-        let height = container.clientHeight || 320;
+        let width = container.clientWidth || 350;
+        let height = container.clientHeight || 350;
 
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-        camera.position.set(0, 0, 7);
+        
+        // Pielāgota kamera, lai objekts būtu tuvu un pamanāms
+        const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 1000);
+        camera.position.set(0, 0, 4.5);
 
         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         renderer.setSize(width, height);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         container.appendChild(renderer.domElement);
 
-        const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+        // Apgaismojums
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1.4);
         scene.add(ambientLight);
 
-        const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.5);
+        const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.8);
         dirLight1.position.set(5, 8, 5);
         scene.add(dirLight1);
 
-        const dirLight2 = new THREE.DirectionalLight(0xffd3b6, 0.8);
+        const dirLight2 = new THREE.DirectionalLight(0xffd3b6, 1.0);
         dirLight2.position.set(-5, -5, -2);
         scene.add(dirLight2);
 
         const modelGroup = new THREE.Group();
         scene.add(modelGroup);
 
+        // Fallback modelis gadījumam, ja macaron.glb nav pieejams
         const createFallbackMacaron = () => {
-          const topCapGeo = new THREE.CylinderGeometry(1.8, 2, 0.6, 32);
-          const matPink = new THREE.MeshStandardMaterial({ color: 0xE0A9AF, roughness: 0.4 });
+          const group = new THREE.Group();
+          
+          const matPink = new THREE.MeshStandardMaterial({ color: 0xE0A9AF, roughness: 0.35, metalness: 0.1 });
+          const matCream = new THREE.MeshStandardMaterial({ color: 0xFFF5C3, roughness: 0.2 });
+
+          const topCapGeo = new THREE.CylinderGeometry(1.4, 1.5, 0.45, 32);
           const topCap = new THREE.Mesh(topCapGeo, matPink);
-          topCap.position.y = 0.4;
+          topCap.position.y = 0.3;
 
           const bottomCap = new THREE.Mesh(topCapGeo, matPink);
-          bottomCap.position.y = -0.4;
+          bottomCap.position.y = -0.3;
           bottomCap.rotation.x = Math.PI;
 
-          const creamGeo = new THREE.CylinderGeometry(1.7, 1.7, 0.3, 32);
-          const matCream = new THREE.MeshStandardMaterial({ color: 0xFFF5C3, roughness: 0.3 });
+          const creamGeo = new THREE.CylinderGeometry(1.35, 1.35, 0.25, 32);
           const cream = new THREE.Mesh(creamGeo, matCream);
 
-          const fallbackGroup = new THREE.Group();
-          fallbackGroup.add(topCap, bottomCap, cream);
-          return fallbackGroup;
+          group.add(topCap, bottomCap, cream);
+          return group;
         };
 
         const loader = new THREE.GLTFLoader();
@@ -146,6 +152,7 @@
           (gltf) => {
             const model = gltf.scene;
 
+            // Precīzs bounding box aprēķins centrēšanai un pietuvināšanai
             const box = new THREE.Box3().setFromObject(model);
             const center = box.getCenter(new THREE.Vector3());
             const size = box.getSize(new THREE.Vector3());
@@ -156,7 +163,8 @@
 
             const maxDim = Math.max(size.x, size.y, size.z);
             if (maxDim > 0) {
-              const targetScale = 3.2 / maxDim;
+              // Mērogošanas koeficients palielināts uz 2.8, lai tas būtu liels un pamanāms
+              const targetScale = 2.8 / maxDim;
               model.scale.set(targetScale, targetScale, targetScale);
             }
 
@@ -173,23 +181,23 @@
         const animate = () => {
           animationFrameId = requestAnimationFrame(animate);
           modelGroup.rotation.y += 0.008;
-          modelGroup.rotation.x = Math.sin(Date.now() * 0.001) * 0.15;
+          modelGroup.rotation.x = Math.sin(Date.now() * 0.001) * 0.12;
           renderer.render(scene, camera);
         };
         animate();
 
-        const resizeObserver = new ResizeObserver((entries) => {
-          for (let entry of entries) {
-            const newWidth = entry.contentRect.width;
-            const newHeight = entry.contentRect.height;
-            if (newWidth > 0 && newHeight > 0) {
-              camera.aspect = newWidth / newHeight;
-              camera.updateProjectionMatrix();
-              renderer.setSize(newWidth, newHeight);
-            }
+        const handleResize = () => {
+          if (!container) return;
+          const newW = container.clientWidth;
+          const newH = container.clientHeight;
+          if (newW > 0 && newH > 0) {
+            camera.aspect = newW / newH;
+            camera.updateProjectionMatrix();
+            renderer.setSize(newW, newH);
           }
-        });
+        };
 
+        const resizeObserver = new ResizeObserver(() => handleResize());
         resizeObserver.observe(container);
 
         return () => {
@@ -205,7 +213,7 @@
       return (
         <div 
           ref={containerRef} 
-          className="w-full h-[320px] max-h-[350px] relative flex items-center justify-center overflow-hidden" 
+          className="w-full h-[350px] min-h-[320px] relative flex items-center justify-center overflow-hidden" 
         />
       );
     }
@@ -300,6 +308,7 @@
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="md:hidden p-2 text-brand-dark"
+                aria-label="Atvērt izvēlni"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={mobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
@@ -358,9 +367,9 @@
                 </p>
               </div>
 
-              <div className="bg-white/70 backdrop-blur-md border border-white/80 rounded-3xl p-4 shadow-lg flex flex-col items-center justify-center">
+              <div className="bg-white/90 backdrop-blur-md border border-white rounded-3xl p-6 shadow-xl flex flex-col items-center justify-center min-h-[380px]">
                 <Macaron3D />
-                <p className="text-xs text-gray-400">Interaktīvs 3D makarūns</p>
+                <p className="text-xs text-gray-400 mt-2">Interaktīvs 3D makarūns</p>
               </div>
             </div>
           </section>
@@ -372,10 +381,10 @@
                 <p className="text-gray-500 text-xs mt-1">Uzkrāj punktus un izbaudi spēli!</p>
               </div>
 
-              <div className="w-full h-[500px] rounded-2xl overflow-hidden border border-gray-100 bg-black">
+              <div className="w-full h-[520px] min-h-[450px] rounded-2xl overflow-hidden border border-gray-200 bg-gray-900 shadow-inner">
                 <iframe 
                   src="game.html" 
-                  className="w-full h-full border-0"
+                  className="w-full h-full border-0 block"
                   title="Macaroon Game"
                   allow="autoplay; fullscreen"
                 ></iframe>
@@ -444,7 +453,7 @@
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                   <h2 className="text-3xl font-bold">Kastītes Salicējs</h2>
-                  <p className="text-gray-500 text-sm">Izvēlies kastes izmēru un piepildi to ar izvēlētajiem makarūniem.</p>
+                  <p className="text-gray-500 text-sm">Izvēlies kastes izmēru un piepildi to ar izvēlētajiem makarūnim.</p>
                 </div>
 
                 <div className="flex bg-brand-pink p-1.5 rounded-2xl gap-2">
