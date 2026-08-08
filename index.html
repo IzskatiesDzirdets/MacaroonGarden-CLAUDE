@@ -8,7 +8,7 @@
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- React, Babel & Three.js (3D animācijai) -->
+  <!-- React, Babel & Three.js -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -122,7 +122,6 @@
       { size: 24, label: 'Kaste 24 gab.', discount: 0.10, gridCols: 'grid-cols-6 sm:grid-cols-8' }
     ];
 
-    // 3D Makarūna Komponente
     function Macaron3D({ activeMood }) {
       const containerRef = useRef(null);
       const macaronMeshRef = useRef(null);
@@ -148,7 +147,6 @@
         dirLight.position.set(5, 5, 5);
         scene.add(dirLight);
 
-        // Makarūna 3D modelis (2 cepumiņi + pildījums)
         const group = new THREE.Group();
 
         const shellGeo = new THREE.CylinderGeometry(1.2, 1.2, 0.35, 32);
@@ -202,14 +200,13 @@
         };
       }, []);
 
-      // Nomaina krāsu 3D makarūnam, kad mainās noskaņa
       useEffect(() => {
         if (macaronMeshRef.current) {
           macaronMeshRef.current.shellMat.color.setHex(activeMood.macaronColor);
         }
       }, [activeMood]);
 
-      return <div ref={containerRef} class="w-full h-full min-h-[350px]" />;
+      return <div ref={containerRef} className="w-full h-full min-h-[350px]" />;
     }
 
     function App() {
@@ -257,34 +254,33 @@
       const currentBoxConfig = BOX_SIZES.find(b => b.size === selectedBoxSize);
 
       return (
-        <div class={`transition-colors duration-500 ${activeMood.bgClass}`}>
+        <div className={`transition-colors duration-500 ${activeMood.bgClass}`}>
           
-          <!-- Navigācija -->
-          <header class="sticky top-0 z-40 bg-white/85 backdrop-blur-md border-b border-rose-100">
-            <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-              <a href="#" class="text-2xl font-serif font-bold tracking-wide text-brand-dark">
-                Macaroon <span class="text-brand-accent italic">Garden</span>
+          <header className="sticky top-0 z-40 bg-white/85 backdrop-blur-md border-b border-rose-100">
+            <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+              <a href="#" className="text-2xl font-serif font-bold tracking-wide text-brand-dark">
+                Macaroon <span className="text-brand-accent italic">Garden</span>
               </a>
 
-              <nav class="hidden md:flex gap-8 text-sm font-medium">
-                <a href="#hero" class="hover:text-brand-accent transition-colors">3D Makarūns</a>
-                <a href="#game-section" class="hover:text-brand-accent transition-colors">Spēle</a>
-                <a href="#flavors" class="hover:text-brand-accent transition-colors">Garšas</a>
-                <a href="#builder" class="hover:text-brand-accent transition-colors">Kastes salicējs</a>
-                <a href="#order" class="hover:text-brand-accent transition-colors">Pasūtīt</a>
+              <nav className="hidden md:flex gap-8 text-sm font-medium">
+                <a href="#hero" className="hover:text-brand-accent transition-colors">3D Makarūns</a>
+                <a href="#game-section" className="hover:text-brand-accent transition-colors">Spēle</a>
+                <a href="#flavors" className="hover:text-brand-accent transition-colors">Garšas</a>
+                <a href="#builder" className="hover:text-brand-accent transition-colors">Kastes salicējs</a>
+                <a href="#order" className="hover:text-brand-accent transition-colors">Pasūtīt</a>
               </nav>
 
-              <div class="hidden md:block">
-                <a href="#builder" class="bg-brand-dark text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-brand-accent transition-colors shadow-sm">
+              <div className="hidden md:block">
+                <a href="#builder" className="bg-brand-dark text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-brand-accent transition-colors shadow-sm">
                   Salikt kasti ({boxItems.length}/{selectedBoxSize})
                 </a>
               </div>
 
               <button 
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                class="md:hidden p-2 text-brand-dark focus:outline-none"
+                className="md:hidden p-2 text-brand-dark focus:outline-none"
               >
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   {mobileMenuOpen ? (
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                   ) : (
@@ -295,38 +291,36 @@
             </div>
 
             {mobileMenuOpen && (
-              <div class="md:hidden bg-white border-b border-rose-100 px-4 pt-2 pb-6 space-y-3 animate-fade-in">
-                <a href="#hero" onClick={() => setMobileMenuOpen(false)} class="block py-2 text-sm font-medium">3D Makarūns</a>
-                <a href="#game-section" onClick={() => setMobileMenuOpen(false)} class="block py-2 text-sm font-medium">Spēle</a>
-                <a href="#flavors" onClick={() => setMobileMenuOpen(false)} class="block py-2 text-sm font-medium">Garšas</a>
-                <a href="#builder" onClick={() => setMobileMenuOpen(false)} class="block py-2 text-sm font-medium">Kastes salicējs</a>
-                <a href="#order" onClick={() => setMobileMenuOpen(false)} class="block py-2 text-sm font-medium">Pasūtīt</a>
+              <div className="md:hidden bg-white border-b border-rose-100 px-4 pt-2 pb-6 space-y-3 animate-fade-in">
+                <a href="#hero" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-sm font-medium">3D Makarūns</a>
+                <a href="#game-section" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-sm font-medium">Spēle</a>
+                <a href="#flavors" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-sm font-medium">Garšas</a>
+                <a href="#builder" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-sm font-medium">Kastes salicējs</a>
+                <a href="#order" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-sm font-medium">Pasūtīt</a>
               </div>
             )}
           </header>
 
-          <!-- HERO SADAĻA: 3D Makarūns & Noskaņu maiņa -->
-          <section id="hero" class="py-16 md:py-20 max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
-            <div class="space-y-6">
-              <span class="text-xs uppercase tracking-widest text-brand-accent font-semibold bg-white/80 px-3 py-1 rounded-full inline-block shadow-sm">
+          <section id="hero" className="py-16 md:py-20 max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <span className="text-xs uppercase tracking-widest text-brand-accent font-semibold bg-white/80 px-3 py-1 rounded-full inline-block shadow-sm">
                 Interaktīvs 3D dizains
               </span>
-              <h1 class="text-5xl md:text-6xl font-bold leading-tight">
-                Izvēlieties savu dienas <span class="italic text-brand-accent">noskaņu</span>
+              <h1 className="text-5xl md:text-6xl font-bold leading-tight">
+                Izvēlieties savu dienas <span className="italic text-brand-accent">noskaņu</span>
               </h1>
-              <p class="text-gray-600 text-lg">
+              <p className="text-gray-600 text-lg">
                 Klikšķiniet uz pogām zemāk, lai mainītu lapas atmosfēru un 3D makarūna krāsu!
               </p>
 
-              <!-- Noskaņu Pogas -->
-              <div class="space-y-2 pt-2">
-                <span class="text-xs font-bold uppercase tracking-wider text-gray-500">Izvēlēties noskaņu:</span>
-                <div class="flex flex-wrap gap-3">
+              <div className="space-y-2 pt-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-gray-500">Izvēlēties noskaņu:</span>
+                <div className="flex flex-wrap gap-3">
                   {MOODS.map(mood => (
                     <button
                       key={mood.id}
                       onClick={() => setActiveMood(mood)}
-                      class={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all shadow-sm ${
+                      className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all shadow-sm ${
                         activeMood.id === mood.id 
                           ? 'bg-brand-dark text-white shadow-md scale-105' 
                           : 'bg-white text-gray-700 hover:bg-gray-50'
@@ -339,26 +333,23 @@
               </div>
             </div>
 
-            <!-- 3D Makarūna Konteiners -->
-            <div class="bg-white/60 backdrop-blur-md border border-white/80 rounded-3xl p-6 shadow-xl relative flex flex-col items-center justify-center">
+            <div className="bg-white/60 backdrop-blur-md border border-white/80 rounded-3xl p-6 shadow-xl relative flex flex-col items-center justify-center">
               <Macaron3D activeMood={activeMood} />
-              <p class="text-xs text-gray-400 mt-2">Interaktīvs 3D makarūna modelis</p>
+              <p className="text-xs text-gray-400 mt-2">Interaktīvs 3D makarūna modelis</p>
             </div>
           </section>
 
-          <!-- SPĒLES SADAĻA (game.html caur iframe) -->
-          <section id="game-section" class="py-12 max-w-6xl mx-auto px-4">
-            <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-rose-100 space-y-6">
-              <div class="text-center space-y-2">
-                <h2 class="text-3xl font-bold">Makarūnu Spēle</h2>
-                <p class="text-gray-600 text-sm">Spēlējiet mūsu spēli tieši šeit un gūstiet patīkamas emocijas!</p>
+          <section id="game-section" className="py-12 max-w-6xl mx-auto px-4">
+            <div className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-rose-100 space-y-6">
+              <div className="text-center space-y-2">
+                <h2 className="text-3xl font-bold">Makarūnu Spēle</h2>
+                <p className="text-gray-600 text-sm">Spēlējiet mūsu spēli tieši šeit un gūstiet patīkamas emocijas!</p>
               </div>
 
-              <!-- Iframe ar spēli -->
-              <div class="w-full h-[450px] md:h-[550px] rounded-2xl overflow-hidden border border-gray-100 shadow-inner bg-gray-50">
+              <div className="w-full h-[450px] md:h-[550px] rounded-2xl overflow-hidden border border-gray-100 shadow-inner bg-gray-50">
                 <iframe 
                   src="game.html" 
-                  class="w-full h-full border-0"
+                  className="w-full h-full border-0"
                   title="Macaroon Game"
                   allow="autoplay"
                 ></iframe>
@@ -366,48 +357,46 @@
             </div>
           </section>
 
-          <!-- GALVENAIS SATURS (Garšas, Kastes salicējs, Forma) -->
-          <main class="max-w-6xl mx-auto px-4 py-12 space-y-20">
+          <main className="max-w-6xl mx-auto px-4 py-12 space-y-20">
             
-            <!-- Garšu Izvēle -->
-            <section id="flavors" class="space-y-8">
-              <div class="text-center space-y-3">
-                <h2 class="text-4xl font-bold">Mūsu Garšas</h2>
-                <p class="text-gray-600 max-w-xl mx-auto">Izvēlieties garšas un pievienojiet tās savai dāvanu kastei.</p>
+            <section id="flavors" className="space-y-8">
+              <div className="text-center space-y-3">
+                <h2 className="text-4xl font-bold">Mūsu Garšas</h2>
+                <p className="text-gray-600 max-w-xl mx-auto">Izvēlieties garšas un pievienojiet tās savai dāvanu kastei.</p>
               </div>
               
-              <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {FLAVORS.map(flavor => {
                   const count = getItemCount(flavor.id);
                   return (
                     <div 
                       key={flavor.id} 
-                      class={`p-6 rounded-2xl border ${flavor.color} transition-all hover:shadow-lg flex flex-col justify-between space-y-4 bg-white/80 backdrop-blur-sm`}
+                      className={`p-6 rounded-2xl border ${flavor.color} transition-all hover:shadow-lg flex flex-col justify-between space-y-4 bg-white/80 backdrop-blur-sm`}
                     >
                       <div>
-                        <div class="flex items-center justify-between mb-2">
-                          <h3 class="text-xl font-bold">{flavor.name}</h3>
-                          <span class={`w-4 h-4 rounded-full ${flavor.circleBg} border border-white shadow-sm`}></span>
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="text-xl font-bold">{flavor.name}</h3>
+                          <span className={`w-4 h-4 rounded-full ${flavor.circleBg} border border-white shadow-sm`}></span>
                         </div>
-                        <p class="text-sm opacity-90">{flavor.desc}</p>
+                        <p className="text-sm opacity-90">{flavor.desc}</p>
                       </div>
-                      <div class="flex justify-between items-center pt-2">
-                        <span class="font-bold text-lg">{flavor.price.toFixed(2)} € / gab.</span>
+                      <div className="flex justify-between items-center pt-2">
+                        <span className="font-bold text-lg">{flavor.price.toFixed(2)} € / gab.</span>
                         
-                        <div class="flex items-center gap-2">
+                        <div className="flex items-center gap-2">
                           {count > 0 && (
                             <button 
                               onClick={() => removeLastItemOfId(flavor.id)}
-                              class="w-8 h-8 rounded-xl bg-white text-brand-dark font-bold flex items-center justify-center shadow-sm"
+                              className="w-8 h-8 rounded-xl bg-white text-brand-dark font-bold flex items-center justify-center shadow-sm"
                             >
                               -
                             </button>
                           )}
-                          {count > 0 && <span class="text-sm font-bold w-4 text-center">{count}</span>}
+                          {count > 0 && <span className="text-sm font-bold w-4 text-center">{count}</span>}
                           <button 
                             onClick={() => addItem(flavor)}
                             disabled={boxItems.length >= selectedBoxSize}
-                            class="bg-brand-dark text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-sm hover:bg-brand-accent transition-all disabled:opacity-50"
+                            className="bg-brand-dark text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-sm hover:bg-brand-accent transition-all disabled:opacity-50"
                           >
                             + Pievienot
                           </button>
@@ -419,15 +408,14 @@
               </div>
             </section>
 
-            <!-- Vizuālais Kastītes Salicējs -->
-            <section id="builder" class="bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-rose-100 space-y-8">
-              <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <section id="builder" className="bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-rose-100 space-y-8">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                  <h2 class="text-3xl font-bold">Kastītes Salicējs</h2>
-                  <p class="text-gray-600 text-sm">Izvēlieties kastītes ietilpību un piepildiet to.</p>
+                  <h2 className="text-3xl font-bold">Kastītes Salicējs</h2>
+                  <p className="text-gray-600 text-sm">Izvēlieties kastītes ietilpību un piepildiet to.</p>
                 </div>
 
-                <div class="flex bg-brand-pink p-1.5 rounded-2xl gap-2">
+                <div className="flex bg-brand-pink p-1.5 rounded-2xl gap-2">
                   {BOX_SIZES.map(box => (
                     <button
                       key={box.size}
@@ -435,7 +423,7 @@
                         setSelectedBoxSize(box.size);
                         setBoxItems([]);
                       }}
-                      class={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                      className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                         selectedBoxSize === box.size 
                           ? 'bg-white shadow-sm text-brand-dark font-bold' 
                           : 'text-gray-600 hover:text-brand-dark'
@@ -447,41 +435,40 @@
                 </div>
               </div>
 
-              <div class="space-y-2">
-                <div class="flex justify-between text-sm font-medium">
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm font-medium">
                   <span>Aizpildījums: {boxItems.length} no {selectedBoxSize} gab.</span>
                   <span>{boxItems.length === selectedBoxSize ? 'Kaste ir pilna! ✨' : `Varat pievienot vēl ${selectedBoxSize - boxItems.length} gab.`}</span>
                 </div>
-                <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+                <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
                   <div 
-                    class="bg-brand-accent h-full transition-all duration-300"
+                    className="bg-brand-accent h-full transition-all duration-300"
                     style={{ width: `${(boxItems.length / selectedBoxSize) * 100}%` }}
                   ></div>
                 </div>
               </div>
 
-              <!-- VIZUĀLAIS KASTES TĪKLĀJS -->
-              <div class="bg-brand-pink/40 p-6 md:p-8 rounded-2xl border border-rose-100">
-                <h4 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-4 text-center">Jūsu dāvanu kastes izkārtojums</h4>
+              <div className="bg-brand-pink/40 p-6 md:p-8 rounded-2xl border border-rose-100">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-4 text-center">Jūsu dāvanu kastes izkārtojums</h4>
                 
-                <div class={`grid ${currentBoxConfig.gridCols} gap-4 max-w-2xl mx-auto`}>
+                <div className={`grid ${currentBoxConfig.gridCols} gap-4 max-w-2xl mx-auto`}>
                   {Array.from({ length: selectedBoxSize }).map((_, index) => {
                     const item = boxItems[index];
                     return (
                       <div 
                         key={index}
-                        class="aspect-square rounded-2xl border-2 border-dashed border-rose-200/80 bg-white/60 flex items-center justify-center relative group transition-all"
+                        className="aspect-square rounded-2xl border-2 border-dashed border-rose-200/80 bg-white/60 flex items-center justify-center relative group transition-all"
                       >
                         {item ? (
                           <div 
                             onClick={() => removeItemAtIndex(index)}
                             title={`Klikšķiniet, lai izņemtu ${item.name}`}
-                            class={`w-4/5 h-4/5 rounded-full ${item.circleBg} shadow-md flex items-center justify-center cursor-pointer transform hover:scale-105 transition-all animate-pop-in relative border-2 border-white`}
+                            className={`w-4/5 h-4/5 rounded-full ${item.circleBg} shadow-md flex items-center justify-center cursor-pointer transform hover:scale-105 transition-all animate-pop-in relative border-2 border-white`}
                           >
-                            <span class="text-[10px] font-bold text-brand-dark/70 opacity-0 group-hover:opacity-100 transition-opacity">✕</span>
+                            <span className="text-[10px] font-bold text-brand-dark/70 opacity-0 group-hover:opacity-100 transition-opacity">✕</span>
                           </div>
                         ) : (
-                          <span class="text-xs text-rose-300 font-light">{index + 1}</span>
+                          <span className="text-xs text-rose-300 font-light">{index + 1}</span>
                         )}
                       </div>
                     );
@@ -490,81 +477,80 @@
               </div>
             </section>
 
-            <!-- Pasūtījuma Forma -->
-            <section id="order" class="max-w-2xl mx-auto bg-white p-8 md:p-10 rounded-3xl shadow-sm border border-rose-100 space-y-6">
-              <div class="text-center space-y-2">
-                <h2 class="text-3xl font-bold">Noformēt Pasūtījumu</h2>
-                <p class="text-gray-600 text-sm">Aizpildiet informāciju saņemšanai.</p>
+            <section id="order" className="max-w-2xl mx-auto bg-white p-8 md:p-10 rounded-3xl shadow-sm border border-rose-100 space-y-6">
+              <div className="text-center space-y-2">
+                <h2 className="text-3xl font-bold">Noformēt Pasūtījumu</h2>
+                <p className="text-gray-600 text-sm">Aizpildiet informāciju saņemšanai.</p>
               </div>
 
-              <form onSubmit={handleSubmit} class="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Vārds, Uzvārds</label>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Vārds, Uzvārds</label>
                   <input 
                     type="text" 
                     required 
                     placeholder="Jānis Bērziņš"
                     value={formData.name}
                     onChange={e => setFormData({...formData, name: e.target.value})}
-                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-accent transition-colors"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-accent transition-colors"
                   />
                 </div>
 
-                <div class="grid sm:grid-cols-2 gap-4">
+                <div className="grid sm:grid-cols-2 gap-4">
                   <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Tālrunis</label>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Tālrunis</label>
                     <input 
                       type="tel" 
                       required 
                       placeholder="+371 20000000"
                       value={formData.phone}
                       onChange={e => setFormData({...formData, phone: e.target.value})}
-                      class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-accent transition-colors"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-accent transition-colors"
                     />
                   </div>
                   <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">E-pasts</label>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">E-pasts</label>
                     <input 
                       type="email" 
                       required 
                       placeholder="janis@gmail.com"
                       value={formData.email}
                       onChange={e => setFormData({...formData, email: e.target.value})}
-                      class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-accent transition-colors"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-accent transition-colors"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Saņemšanas datums</label>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Saņemšanas datums</label>
                   <input 
                     type="date" 
                     required 
                     value={formData.date}
                     onChange={e => setFormData({...formData, date: e.target.value})}
-                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-accent transition-colors text-gray-700"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-accent transition-colors text-gray-700"
                   />
                 </div>
 
                 <div>
-                  <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Piezīmes</label>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Piezīmes</label>
                   <textarea 
                     rows="3" 
                     placeholder="Papildu vēlmes vai saņemšanas detaļas..."
                     value={formData.notes}
                     onChange={e => setFormData({...formData, notes: e.target.value})}
-                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-accent transition-colors"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-accent transition-colors"
                   ></textarea>
                 </div>
 
-                <div class="pt-4 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div className="pt-4 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
                   <div>
-                    <span class="text-xs text-gray-500 block">Kopējā summa (ar atlaidi):</span>
-                    <span class="text-3xl font-bold text-brand-dark">{calculateTotal()} €</span>
+                    <span className="text-xs text-gray-500 block">Kopējā summa (ar atlaidi):</span>
+                    <span className="text-3xl font-bold text-brand-dark">{calculateTotal()} €</span>
                   </div>
                   <button 
                     type="submit"
-                    class="w-full sm:w-auto bg-brand-dark text-white px-8 py-3.5 rounded-xl font-bold hover:bg-brand-accent transition-colors shadow-md"
+                    className="w-full sm:w-auto bg-brand-dark text-white px-8 py-3.5 rounded-xl font-bold hover:bg-brand-accent transition-colors shadow-md"
                   >
                     Nosūtīt pasūtījumu
                   </button>
@@ -574,16 +560,15 @@
 
           </main>
 
-          <!-- VEIKSMES MODĀLAIS LOGS -->
           {showModal && (
-            <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-              <div class="bg-white max-w-md w-full p-8 rounded-3xl shadow-2xl space-y-6 text-center transform animate-pop-in">
-                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+              <div className="bg-white max-w-md w-full p-8 rounded-3xl shadow-2xl space-y-6 text-center transform animate-pop-in">
+                <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">
                   ✓
                 </div>
-                <div class="space-y-2">
-                  <h3 class="text-3xl font-serif font-bold text-brand-dark">Paldies par pasūtījumu!</h3>
-                  <p class="text-gray-600 text-sm">
+                <div className="space-y-2">
+                  <h3 className="text-3xl font-serif font-bold text-brand-dark">Paldies par pasūtījumu!</h3>
+                  <p className="text-gray-600 text-sm">
                     Mēs esam saņēmuši Jūsu pasūtījumu. Drīzumā sazināsimies uz e-pastu <strong>{formData.email}</strong>, lai apstiprinātu saņemšanas laiku.
                   </p>
                 </div>
@@ -593,7 +578,7 @@
                     setBoxItems([]);
                     setFormData({ name: '', phone: '', email: '', date: '', notes: '' });
                   }}
-                  class="w-full bg-brand-dark text-white py-3.5 rounded-xl font-bold hover:bg-brand-accent transition-colors"
+                  className="w-full bg-brand-dark text-white py-3.5 rounded-xl font-bold hover:bg-brand-accent transition-colors"
                 >
                   Aizvērt un sākt no jauna
                 </button>
