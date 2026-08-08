@@ -92,79 +92,122 @@
       const containerRef = useRef(null);
 
       useEffect(() => {
-        if (!containerRef.current) return;
+        const container = containerRef.current;
+        if (!container) return;
 
-        const width = containerRef.current.clientWidth;
-        const height = containerRef.current.clientHeight;
+        let width = container.clientWidth || 300;
+        let height = container.clientHeight || 320;
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+        camera.position.set(0, 0, 7);
 
         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         renderer.setSize(width, height);
-        containerRef.current.appendChild(renderer.domElement);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
 
-        const ambientLight = new THREE.AmbientLight(0xffffff, 1.4);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
         scene.add(ambientLight);
 
-        const dirLight = new THREE.DirectionalLight(0xffffff, 1.8);
-        dirLight.position.set(5, 10, 7);
-        scene.add(dirLight);
+        const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.5);
+        dirLight1.position.set(5, 8, 5);
+        scene.add(dirLight1);
 
-        let modelGroup = new THREE.Group();
+        const dirLight2 = new THREE.DirectionalLight(0xffd3b6, 0.8);
+        dirLight2.position.set(-5, -5, -2);
+        scene.add(dirLight2);
+
+        const modelGroup = new THREE.Group();
         scene.add(modelGroup);
 
+        const createFallbackMacaron = () => {
+          const topCapGeo = new THREE.CylinderGeometry(1.8, 2, 0.6, 32);
+          const matPink = new THREE.MeshStandardMaterial({ color: 0xE0A9AF, roughness: 0.4 });
+          const topCap = new THREE.Mesh(topCapGeo, matPink);
+          topCap.position.y = 0.4;
+
+          const bottomCap = new THREE.Mesh(topCapGeo, matPink);
+          bottomCap.position.y = -0.4;
+          bottomCap.rotation.x = Math.PI;
+
+          const creamGeo = new THREE.CylinderGeometry(1.7, 1.7, 0.3, 32);
+          const matCream = new THREE.MeshStandardMaterial({ color: 0xFFF5C3, roughness: 0.3 });
+          const cream = new THREE.Mesh(creamGeo, matCream);
+
+          const fallbackGroup = new THREE.Group();
+          fallbackGroup.add(topCap, bottomCap, cream);
+          return fallbackGroup;
+        };
+
         const loader = new THREE.GLTFLoader();
-        loader.load('macaron.glb', (gltf) => {
-          const model = gltf.scene;
+        loader.load(
+          'macaron.glb',
+          (gltf) => {
+            const model = gltf.scene;
 
-          const box = new THREE.Box3().setFromObject(model);
-          const size = box.getSize(new THREE.Vector3());
-          const center = box.getCenter(new THREE.Vector3());
+            const box = new THREE.Box3().setFromObject(model);
+            const center = box.getCenter(new THREE.Vector3());
+            const size = box.getSize(new THREE.Vector3());
 
-          model.position.x -= center.x;
-          model.position.y -= center.y;
-          model.position.z -= center.z;
+            model.position.x -= center.x;
+            model.position.y -= center.y;
+            model.position.z -= center.z;
 
-          const maxDim = Math.max(size.x, size.y, size.z);
-          const scale = 2.5 / maxDim;
-          model.scale.set(scale, scale, scale);
+            const maxDim = Math.max(size.x, size.y, size.z);
+            if (maxDim > 0) {
+              const targetScale = 3.2 / maxDim;
+              model.scale.set(targetScale, targetScale, targetScale);
+            }
 
-          camera.position.set(0, 0, 5);
-          modelGroup.add(model);
-        }, undefined, (error) => {
-          console.error("Kļūda ielādējot macaron.glb:", error);
-        });
+            modelGroup.add(model);
+          },
+          undefined,
+          (err) => {
+            console.warn("macaron.glb nevarēja ielādēt. Tiek izmantots 3D fallback modelis.", err);
+            modelGroup.add(createFallbackMacaron());
+          }
+        );
 
         let animationFrameId;
         const animate = () => {
           animationFrameId = requestAnimationFrame(animate);
           modelGroup.rotation.y += 0.008;
-          modelGroup.rotation.x = Math.sin(Date.now() * 0.001) * 0.1;
+          modelGroup.rotation.x = Math.sin(Date.now() * 0.001) * 0.15;
           renderer.render(scene, camera);
         };
         animate();
 
-        const handleResize = () => {
-          if (!containerRef.current) return;
-          const w = containerRef.current.clientWidth;
-          const h = containerRef.current.clientHeight;
-          camera.aspect = w / h;
-          camera.updateProjectionMatrix();
-          renderer.setSize(w, h);
-        };
-        window.addEventListener('resize', handleResize);
+        const resizeObserver = new ResizeObserver((entries) => {
+          for (let entry of entries) {
+            const newWidth = entry.contentRect.width;
+            const newHeight = entry.contentRect.height;
+            if (newWidth > 0 && newHeight > 0) {
+              camera.aspect = newWidth / newHeight;
+              camera.updateProjectionMatrix();
+              renderer.setSize(newWidth, newHeight);
+            }
+          }
+        });
+
+        resizeObserver.observe(container);
 
         return () => {
           cancelAnimationFrame(animationFrameId);
-          window.removeEventListener('resize', handleResize);
-          if (containerRef.current && renderer.domElement) {
-            containerRef.current.removeChild(renderer.domElement);
+          resizeObserver.disconnect();
+          if (container && renderer.domElement) {
+            container.removeChild(renderer.domElement);
           }
+          renderer.dispose();
         };
       }, []);
 
-      return <div ref={containerRef} className="w-full h-[320px]" />;
+      return (
+        <div 
+          ref={containerRef} 
+          className="w-full h-[320px] max-h-[350px] relative flex items-center justify-center overflow-hidden" 
+        />
+      );
     }
 
     function App() {
@@ -475,10 +518,15 @@
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Vārds, Uzvārds</label>
+                  <label htmlFor="fullname" className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
+                    Vārds, Uzvārds
+                  </label>
                   <input 
+                    id="fullname"
+                    name="fullname"
                     type="text" 
                     required 
+                    autoComplete="name"
                     placeholder="Jānis Bērziņš"
                     value={formData.name}
                     onChange={e => setFormData({...formData, name: e.target.value})}
@@ -488,10 +536,15 @@
 
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Tālrunis</label>
+                    <label htmlFor="phone" className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
+                      Tālrunis
+                    </label>
                     <input 
+                      id="phone"
+                      name="phone"
                       type="tel" 
                       required 
+                      autoComplete="tel"
                       placeholder="+371 20000000"
                       value={formData.phone}
                       onChange={e => setFormData({...formData, phone: e.target.value})}
@@ -499,10 +552,15 @@
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">E-pasts</label>
+                    <label htmlFor="email" className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
+                      E-pasts
+                    </label>
                     <input 
+                      id="email"
+                      name="email"
                       type="email" 
                       required 
+                      autoComplete="email"
                       placeholder="janis@gmail.com"
                       value={formData.email}
                       onChange={e => setFormData({...formData, email: e.target.value})}
@@ -512,8 +570,12 @@
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Saņemšanas datums</label>
+                  <label htmlFor="date" className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
+                    Saņemšanas datums
+                  </label>
                   <input 
+                    id="date"
+                    name="date"
                     type="date" 
                     required 
                     value={formData.date}
@@ -523,8 +585,12 @@
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Piezīmes</label>
+                  <label htmlFor="notes" className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
+                    Piezīmes
+                  </label>
                   <textarea 
+                    id="notes"
+                    name="notes"
                     rows="3" 
                     placeholder="Papildu vēlmes vai saņemšanas detaļas..."
                     value={formData.notes}
@@ -629,10 +695,15 @@
 
                 <form onSubmit={handleAdminLogin} className="space-y-4">
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Lietotājvārds</label>
+                    <label htmlFor="admin-username" className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
+                      Lietotājvārds
+                    </label>
                     <input 
+                      id="admin-username"
+                      name="username"
                       type="text" 
                       required 
+                      autoComplete="username"
                       value={loginUser}
                       onChange={e => setLoginUser(e.target.value)}
                       className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-brand-accent"
@@ -641,10 +712,15 @@
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Parole</label>
+                    <label htmlFor="admin-password" className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
+                      Parole
+                    </label>
                     <input 
+                      id="admin-password"
+                      name="password"
                       type="password" 
                       required 
+                      autoComplete="current-password"
                       value={loginPass}
                       onChange={e => setLoginPass(e.target.value)}
                       className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-brand-accent"
