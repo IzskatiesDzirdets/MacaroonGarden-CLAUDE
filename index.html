@@ -226,7 +226,6 @@
       return (
         <div className={`transition-colors duration-500 min-h-screen ${activeMood.bgClass}`}>
           
-          <!-- Header -->
           <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-rose-100">
             <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
               <a href="#" className="text-2xl font-serif font-bold tracking-wide text-brand-dark">
@@ -283,7 +282,6 @@
             )}
           </header>
 
-          <!-- Main Hero -->
           <section id="hero" className="pt-8 pb-12 max-w-6xl mx-auto px-4 space-y-8">
             <div className="bg-white/80 backdrop-blur-md p-4 rounded-2xl border border-white/80 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
               <span className="text-sm font-bold uppercase tracking-wider text-brand-dark">
@@ -324,7 +322,6 @@
             </div>
           </section>
 
-          <!-- Spēle -->
           <section id="game-section" className="py-8 max-w-6xl mx-auto px-4">
             <div className="bg-white p-6 rounded-3xl shadow-sm border border-rose-100 space-y-4">
               <div className="text-center">
@@ -337,16 +334,14 @@
                   src="game.html" 
                   className="w-full h-full border-0"
                   title="Macaroon Game"
-                  allow="autoplay; fullscreen; focus-without-user-activation"
+                  allow="autoplay; fullscreen"
                 ></iframe>
               </div>
             </div>
           </section>
 
-          <!-- Main Saturs -->
           <main className="max-w-6xl mx-auto px-4 py-8 space-y-16">
             
-            <!-- Garšas -->
             <section id="flavors" className="space-y-6">
               <div className="text-center space-y-2">
                 <h2 className="text-4xl font-bold">Mūsu Garšas</h2>
@@ -402,7 +397,6 @@
               </div>
             </section>
 
-            <!-- Kastītes Salicējs -->
             <section id="builder" className="bg-white p-8 rounded-3xl shadow-sm border border-rose-100 space-y-8">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
@@ -431,7 +425,6 @@
                 </div>
               </div>
 
-              <!-- Progress bar -->
               <div className="space-y-2">
                 <div className="flex justify-between text-xs font-bold text-gray-600">
                   <span>Aizpildījums: {boxItems.length} / {selectedBoxSize} gab.</span>
@@ -445,7 +438,6 @@
                 </div>
               </div>
 
-              <!-- Kastes Vizualizācija -->
               <div className="bg-brand-pink/30 p-8 rounded-3xl border border-rose-100">
                 <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4 max-w-3xl mx-auto">
                   {Array.from({ length: selectedBoxSize }).map((_, index) => {
@@ -475,7 +467,6 @@
               </div>
             </section>
 
-            <!-- Pasūtīšana -->
             <section id="order" className="max-w-2xl mx-auto bg-white p-8 rounded-3xl shadow-sm border border-rose-100 space-y-6">
               <div className="text-center space-y-1">
                 <h2 className="text-3xl font-bold">Noformēt Pasūtījumu</h2>
@@ -559,21 +550,20 @@
 
           </main>
 
-          <!-- Kājene -->
-          <footer class="bg-brand-dark text-white/80 py-12 border-t border-rose-900/20 mt-16">
-            <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-3 gap-8 text-sm">
-              <div class="space-y-3">
-                <h3 class="text-2xl font-serif text-white font-bold">Macaroon Garden</h3>
-                <p class="text-white/60">Ekskluzīvi roku darba makarūni jūsu īpašajiem mirkļiem.</p>
+          <footer className="bg-brand-dark text-white/80 py-12 border-t border-rose-900/20 mt-16">
+            <div className="max-w-6xl mx-auto px-4 grid md:grid-cols-3 gap-8 text-sm">
+              <div className="space-y-3">
+                <h3 className="text-2xl font-serif text-white font-bold">Macaroon Garden</h3>
+                <p className="text-white/60">Ekskluzīvi roku darba makarūni jūsu īpašajiem mirkļiem.</p>
               </div>
-              <div class="space-y-2">
-                <h4 class="text-white font-semibold mb-3">Kontakti</h4>
+              <div className="space-y-2">
+                <h4 className="text-white font-semibold mb-3">Kontakti</h4>
                 <p>Valmiera / Rīga, Latvija</p>
                 <p>E-pasts: info@macaroongarden.lv</p>
                 <p>Tālrunis: +371 20 000 000</p>
               </div>
-              <div class="space-y-2">
-                <h4 class="text-white font-semibold mb-3">Administrācija</h4>
+              <div className="space-y-2">
+                <h4 className="text-white font-semibold mb-3">Administrācija</h4>
                 <button 
                   type="button"
                   onClick={() => setShowLoginModal(true)}
@@ -583,12 +573,11 @@
                 </button>
               </div>
             </div>
-            <div class="max-w-6xl mx-auto px-4 mt-8 pt-8 border-t border-white/10 text-xs text-center text-white/40">
+            <div className="max-w-6xl mx-auto px-4 mt-8 pt-8 border-t border-white/10 text-xs text-center text-white/40">
               &copy; 2026 Macaroon Garden. Visas tiesības aizsargātas.
             </div>
           </footer>
 
-          <!-- VEIKSMES MODĀLIS -->
           {showModal && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
               <div className="bg-white max-w-md w-full p-8 rounded-3xl shadow-2xl space-y-6 text-center">
@@ -598,7 +587,7 @@
                 <div className="space-y-2">
                   <h3 className="text-3xl font-serif font-bold text-brand-dark">Paldies par pasūtījumu!</h3>
                   <p className="text-gray-600 text-sm">
-                    Mēs esam saņēmuši Jūsu pasūtījumu un drīzumā sazināsimies uz e-pasts: <strong>{formData.email}</strong>.
+                    Mēs esam saņēmuši Jūsu pasūtījumu un drīzumā sazināsimies uz e-pastu: <strong>{formData.email}</strong>.
                   </p>
                 </div>
                 <button 
@@ -616,7 +605,6 @@
             </div>
           )}
 
-          <!-- ADMIN LOGOŠANĀS MODĀLIS -->
           {showLoginModal && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
               <div className="bg-white max-w-sm w-full p-8 rounded-3xl shadow-2xl space-y-6 relative">
