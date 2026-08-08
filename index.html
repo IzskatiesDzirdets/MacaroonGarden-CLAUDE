@@ -3,23 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Macaroon Garden | Ekskluzīvi Makarūni</title>
+  <title>Macaroon Garden | Premium Makarūni</title>
   
-  <!-- Tailwind CSS & Lucide Icons -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Three.js priekš 3D renderinga -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-  <!-- React & Babel -->
+  <!-- React, Babel & Three.js (3D animācijai) -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <script>
     tailwind.config = {
@@ -37,6 +35,21 @@
               gold: '#D4AF37',
               cream: '#FAFAFA'
             }
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0', transform: 'scale(0.95)' },
+              '100%': { opacity: '1', transform: 'scale(1)' },
+            },
+            popIn: {
+              '0%': { transform: 'scale(0)' },
+              '80%': { transform: 'scale(1.1)' },
+              '100%': { transform: 'scale(1)' },
+            }
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.25s ease-out forwards',
+            'pop-in': 'popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
           }
         }
       }
@@ -48,80 +61,23 @@
       font-family: 'Plus Jakarta Sans', sans-serif;
       background-color: #FAFAFA;
       color: #2C2223;
+      transition: background-color 0.5s ease, color 0.5s ease;
     }
     h1, h2, h3, .font-serif {
       font-family: 'Cormorant Garamond', serif;
     }
-    #macaron-3d-canvas {
-      width: 100%;
-      height: 100%;
-      outline: none;
-    }
   </style>
 </head>
-<body class="bg-brand-cream text-brand-dark antialiased selection:bg-brand-accent selection:text-white">
+<body class="bg-brand-cream text-brand-dark antialiased">
 
-  <!-- Header / Navigācija -->
-  <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-rose-100">
-    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-      <a href="#" class="text-2xl font-serif font-bold tracking-wide text-brand-dark">
-        Macaroon <span class="text-brand-accent italic">Garden</span>
-      </a>
-      <nav class="hidden md:flex gap-8 text-sm font-medium">
-        <a href="#flavors" class="hover:text-brand-accent transition-colors">Garšas</a>
-        <a href="#builder" class="hover:text-brand-accent transition-colors">Kastes konstruktors</a>
-        <a href="#order" class="hover:text-brand-accent transition-colors">Pasūtīt</a>
-      </nav>
-      <a href="#order" class="bg-brand-dark text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-brand-accent transition-colors shadow-sm">
-        Pasūtīt tagad
-      </a>
-    </div>
-  </header>
-
-  <!-- Hero Sadaļa ar 3D Canvas -->
-  <section class="relative py-16 md:py-24 overflow-hidden bg-gradient-to-b from-brand-pink/50 to-transparent">
-    <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
-      <div class="space-y-6 z-10">
-        <span class="text-xs uppercase tracking-widest text-brand-accent font-semibold bg-rose-100/60 px-3 py-1 rounded-full inline-block">
-          Interaktīva 3D pieredze & Premium garšas
-        </span>
-        <h1 class="text-5xl md:text-6xl font-bold leading-tight">
-          Izbaudiet mirkli ar nepārspējamiem <span class="italic text-brand-accent">makarūniem</span>
-        </h1>
-        <p class="text-gray-600 text-lg max-w-md">
-          Radīti ar mīlestību un visaugstākās kvalitātes sastāvdaļām. Izvēlieties garšu zemāk un vērojiet 3D makarūna krāsas maiņu!
-        </p>
-        <div class="flex flex-wrap gap-4 pt-2">
-          <a href="#builder" class="bg-brand-accent text-white px-8 py-3.5 rounded-full font-medium hover:opacity-90 transition-all shadow-md">
-            Izveidot savu kasti
-          </a>
-          <a href="#flavors" class="border border-brand-dark/20 px-8 py-3.5 rounded-full font-medium hover:bg-white transition-all">
-            Skatīt garšas
-          </a>
-        </div>
-      </div>
-
-      <!-- 3D Makarūna Kanva -->
-      <div class="relative w-full h-[380px] md:h-[450px] flex items-center justify-center">
-        <div class="w-72 h-72 md:w-96 md:h-96 rounded-full bg-rose-200/30 absolute -z-10 blur-3xl"></div>
-        <div id="canvas-container" class="w-full h-full cursor-grab active:cursor-grabbing">
-          <canvas id="macaron-3d-canvas"></canvas>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- React Aplikācijas Sakne -->
-  <main class="max-w-6xl mx-auto px-4 py-12 space-y-20">
-    <div id="react-app"></div>
-  </main>
+  <div id="react-app"></div>
 
   <!-- Kājene -->
   <footer class="bg-brand-dark text-white/80 py-12 border-t border-rose-900/20">
     <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-3 gap-8 text-sm">
       <div class="space-y-3">
         <h3 class="text-2xl font-serif text-white font-bold">Macaroon Garden</h3>
-        <p class="text-white/60">Ekskluzīvi roku darba makarūni jūsu īpašajiem mirkļiem un ikdienas saldumam.</p>
+        <p class="text-white/60">Ekskluzīvi roku darba makarūni jūsu īpašajiem mirkļiem.</p>
       </div>
       <div class="space-y-2">
         <h4 class="text-white font-semibold mb-3">Kontakti</h4>
@@ -132,7 +88,7 @@
       <div class="space-y-2">
         <h4 class="text-white font-semibold mb-3">Darba laiks</h4>
         <p>P. - Pk.: 09:00 - 18:00</p>
-        <p>S. - Sv.: Pēc iepriekšēja pasūtījuma</p>
+        <p>S. - Sv.: Pēc pasūtījuma</p>
       </div>
     </div>
     <div class="max-w-6xl mx-auto px-4 mt-8 pt-8 border-t border-white/10 text-xs text-center text-white/40">
@@ -140,68 +96,150 @@
     </div>
   </footer>
 
-  <!-- Interaktīvā React & 3D Loģika -->
+  <!-- React un 3D Loģika -->
   <script type="text/babel">
     const { useState, useEffect, useRef } = React;
 
+    const MOODS = [
+      { id: 'romantic', name: 'Romantiskā', color: '#E0A9AF', bgClass: 'bg-[#FDF0F0]', macaronColor: 0xE0A9AF },
+      { id: 'fresh', name: 'Svaigā', color: '#A8E6CF', bgClass: 'bg-[#E8F8F5]', macaronColor: 0xA8E6CF },
+      { id: 'luxury', name: 'Luksuss', color: '#D4AF37', bgClass: 'bg-[#FAF4E8]', macaronColor: 0xD4AF37 },
+      { id: 'berry', name: 'Ogu', color: '#D980FA', bgClass: 'bg-[#F8EFBA]', macaronColor: 0xD980FA }
+    ];
+
     const FLAVORS = [
-      { id: 'pistachio', name: 'Pistāciju', desc: 'Sicīlijas pistāciju krēms ar maigu riekstu garšu', color: 'bg-emerald-100 border-emerald-300', hex: 0x88c999, price: 1.80 },
-      { id: 'raspberry', name: 'Avenes & Šokolāde', desc: 'Svaigu aveņu pildījums ar tumšo Beļģijas šokolādi', color: 'bg-rose-100 border-rose-300', hex: 0xe65c82, price: 1.80 },
-      { id: 'caramel', name: 'Sāļā Karamele', desc: 'Pašgatavota sviesta karamele ar jūras sāls kristāliem', color: 'bg-amber-100 border-amber-300', hex: 0xd99b4e, price: 1.80 },
-      { id: 'vanilla', name: 'Madagaskaras Vanilija', desc: 'Klasisks vaniļas pildījums ar īstām vaniļas pākstīm', color: 'bg-orange-50 border-orange-200', hex: 0xfceabb, price: 1.80 },
-      { id: 'lemon', name: 'Citruss & Citrons', desc: 'Svaigs un atspirdzinošs citrona krēms', color: 'bg-yellow-100 border-yellow-300', hex: 0xfadb4d, price: 1.80 },
-      { id: 'blueberry', name: 'Mellenes & Lavanda', desc: 'Meža melleņu pildījums ar vieglu lavandas noti', color: 'bg-purple-100 border-purple-300', hex: 0x9b88c9, price: 1.80 }
+      { id: 'pistachio', name: 'Pistāciju', desc: 'Sicīlijas pistāciju krēms ar maigu riekstu garšu', color: 'bg-emerald-200 border-emerald-400 text-emerald-900', circleBg: 'bg-emerald-400', price: 1.80 },
+      { id: 'raspberry', name: 'Avenes & Šokolāde', desc: 'Svaigu aveņu pildījums ar tumšo Beļģijas šokolādi', color: 'bg-rose-200 border-rose-400 text-rose-900', circleBg: 'bg-rose-400', price: 1.80 },
+      { id: 'caramel', name: 'Sāļā Karamele', desc: 'Pašgatavota sviesta karamele ar jūras sāls kristāliem', color: 'bg-amber-200 border-amber-400 text-amber-900', circleBg: 'bg-amber-400', price: 1.80 },
+      { id: 'vanilla', name: 'Madagaskaras Vanilija', desc: 'Klasisks vaniļas pildījums ar īstām vaniļas pākstīm', color: 'bg-orange-100 border-orange-300 text-orange-900', circleBg: 'bg-orange-200', price: 1.80 },
+      { id: 'lemon', name: 'Citruss & Citrons', desc: 'Svaigs un atspirdzinošs citrona krēms', color: 'bg-yellow-200 border-yellow-400 text-yellow-900', circleBg: 'bg-yellow-300', price: 1.80 },
+      { id: 'blueberry', name: 'Mellenes & Lavanda', desc: 'Meža melleņu pildījums ar vieglu lavandas noti', color: 'bg-purple-200 border-purple-400 text-purple-900', circleBg: 'bg-purple-300', price: 1.80 }
     ];
 
     const BOX_SIZES = [
-      { size: 6, label: 'Kaste 6 gab.', discount: 0 },
-      { size: 12, label: 'Kaste 12 gab.', discount: 0.05 },
-      { size: 24, label: 'Kaste 24 gab.', discount: 0.10 }
+      { size: 6, label: 'Kaste 6 gab.', discount: 0, gridCols: 'grid-cols-3 sm:grid-cols-6' },
+      { size: 12, label: 'Kaste 12 gab.', discount: 0.05, gridCols: 'grid-cols-4 sm:grid-cols-6' },
+      { size: 24, label: 'Kaste 24 gab.', discount: 0.10, gridCols: 'grid-cols-6 sm:grid-cols-8' }
     ];
 
-    // Global mainīgais 3D krāsas atjaunošanai
-    window.update3DMacaronColor = null;
+    // 3D Makarūna Komponente
+    function Macaron3D({ activeMood }) {
+      const containerRef = useRef(null);
+      const macaronMeshRef = useRef(null);
+
+      useEffect(() => {
+        if (!containerRef.current) return;
+
+        const width = containerRef.current.clientWidth;
+        const height = containerRef.current.clientHeight;
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+        camera.position.z = 5;
+
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(width, height);
+        containerRef.current.appendChild(renderer.domElement);
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+        scene.add(ambientLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+        dirLight.position.set(5, 5, 5);
+        scene.add(dirLight);
+
+        // Makarūna 3D modelis (2 cepumiņi + pildījums)
+        const group = new THREE.Group();
+
+        const shellGeo = new THREE.CylinderGeometry(1.2, 1.2, 0.35, 32);
+        const shellMat = new THREE.MeshStandardMaterial({ 
+          color: activeMood.macaronColor, 
+          roughness: 0.3, 
+          metalness: 0.1 
+        });
+
+        const topShell = new THREE.Mesh(shellGeo, shellMat);
+        topShell.position.y = 0.25;
+        group.add(topShell);
+
+        const bottomShell = new THREE.Mesh(shellGeo, shellMat);
+        bottomShell.position.y = -0.25;
+        group.add(bottomShell);
+
+        const fillingGeo = new THREE.CylinderGeometry(1.05, 1.05, 0.2, 32);
+        const fillingMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.8 });
+        const filling = new THREE.Mesh(fillingGeo, fillingMat);
+        group.add(filling);
+
+        scene.add(group);
+        macaronMeshRef.current = { group, shellMat };
+
+        let animationFrameId;
+        const animate = () => {
+          animationFrameId = requestAnimationFrame(animate);
+          group.rotation.y += 0.01;
+          group.rotation.x = Math.sin(Date.now() * 0.001) * 0.15;
+          renderer.render(scene, camera);
+        };
+        animate();
+
+        const handleResize = () => {
+          if (!containerRef.current) return;
+          const w = containerRef.current.clientWidth;
+          const h = containerRef.current.clientHeight;
+          camera.aspect = w / h;
+          camera.updateProjectionMatrix();
+          renderer.setSize(w, h);
+        };
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+          cancelAnimationFrame(animationFrameId);
+          window.removeEventListener('resize', handleResize);
+          if (containerRef.current && renderer.domElement) {
+            containerRef.current.removeChild(renderer.domElement);
+          }
+        };
+      }, []);
+
+      // Nomaina krāsu 3D makarūnam, kad mainās noskaņa
+      useEffect(() => {
+        if (macaronMeshRef.current) {
+          macaronMeshRef.current.shellMat.color.setHex(activeMood.macaronColor);
+        }
+      }, [activeMood]);
+
+      return <div ref={containerRef} class="w-full h-full min-h-[350px]" />;
+    }
 
     function App() {
+      const [activeMood, setActiveMood] = useState(MOODS[0]);
+      const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
       const [selectedBoxSize, setSelectedBoxSize] = useState(12);
-      const [boxItems, setBoxItems] = useState({});
-      const [activeColorHex, setActiveColorHex] = useState(0xe65c82);
+      const [boxItems, setBoxItems] = useState([]);
       const [formData, setFormData] = useState({ name: '', phone: '', email: '', date: '', notes: '' });
-      const [isSubmitted, setIsSubmitted] = useState(false);
+      const [showModal, setShowModal] = useState(false);
 
-      const totalItemsCount = Object.values(boxItems).reduce((sum, count) => sum + count, 0);
+      const addItem = (flavor) => {
+        if (boxItems.length >= selectedBoxSize) return;
+        setBoxItems(prev => [...prev, flavor]);
+      };
 
-      const change3DColor = (hex) => {
-        setActiveColorHex(hex);
-        if (window.update3DMacaronColor) {
-          window.update3DMacaronColor(hex);
+      const removeItemAtIndex = (index) => {
+        setBoxItems(prev => prev.filter((_, i) => i !== index));
+      };
+
+      const removeLastItemOfId = (id) => {
+        const lastIndex = boxItems.map(item => item.id).lastIndexOf(id);
+        if (lastIndex !== -1) {
+          removeItemAtIndex(lastIndex);
         }
       };
 
-      const addItem = (flavor) => {
-        change3DColor(flavor.hex);
-        if (totalItemsCount >= selectedBoxSize) return;
-        setBoxItems(prev => ({ ...prev, [flavor.id]: (prev[flavor.id] || 0) + 1 }));
-      };
-
-      const removeItem = (id) => {
-        setBoxItems(prev => {
-          const updated = { ...prev };
-          if (updated[id] > 1) {
-            updated[id] -= 1;
-          } else {
-            delete updated[id];
-          }
-          return updated;
-        });
-      };
+      const getItemCount = (id) => boxItems.filter(item => item.id === id).length;
 
       const calculateTotal = () => {
-        const rawTotal = Object.entries(boxItems).reduce((sum, [id, count]) => {
-          const flavor = FLAVORS.find(f => f.id === id);
-          return sum + (flavor ? flavor.price * count : 0);
-        }, 0);
-
+        const rawTotal = boxItems.reduce((sum, item) => sum + item.price, 0);
         const currentBox = BOX_SIZES.find(b => b.size === selectedBoxSize);
         const discount = currentBox ? currentBox.discount : 0;
         return (rawTotal * (1 - discount)).toFixed(2);
@@ -209,136 +247,256 @@
 
       const handleSubmit = (e) => {
         e.preventDefault();
-        if (totalItemsCount === 0) {
-          alert('Lūdzu, izvēlieties vismaz vienu makarūnu!');
+        if (boxItems.length === 0) {
+          alert('Lūdzu, pievienojiet vismaz vienu makarūnu kastei!');
           return;
         }
-        setIsSubmitted(true);
+        setShowModal(true);
       };
 
+      const currentBoxConfig = BOX_SIZES.find(b => b.size === selectedBoxSize);
+
       return (
-        <div class="space-y-20">
+        <div class={`transition-colors duration-500 ${activeMood.bgClass}`}>
           
-          <!-- Garšu saraksts -->
-          <section id="flavors" class="space-y-8">
-            <div class="text-center space-y-3">
-              <h2 class="text-4xl font-bold">Mūsu Populārākās Garšas</h2>
-              <p class="text-gray-600 max-w-xl mx-auto">Uzspiediet uz garšas, lai apskatītu tās krāsu 3D modelī augstāk!</p>
+          <!-- Navigācija -->
+          <header class="sticky top-0 z-40 bg-white/85 backdrop-blur-md border-b border-rose-100">
+            <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+              <a href="#" class="text-2xl font-serif font-bold tracking-wide text-brand-dark">
+                Macaroon <span class="text-brand-accent italic">Garden</span>
+              </a>
+
+              <nav class="hidden md:flex gap-8 text-sm font-medium">
+                <a href="#hero" class="hover:text-brand-accent transition-colors">3D Makarūns</a>
+                <a href="#game-section" class="hover:text-brand-accent transition-colors">Spēle</a>
+                <a href="#flavors" class="hover:text-brand-accent transition-colors">Garšas</a>
+                <a href="#builder" class="hover:text-brand-accent transition-colors">Kastes salicējs</a>
+                <a href="#order" class="hover:text-brand-accent transition-colors">Pasūtīt</a>
+              </nav>
+
+              <div class="hidden md:block">
+                <a href="#builder" class="bg-brand-dark text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-brand-accent transition-colors shadow-sm">
+                  Salikt kasti ({boxItems.length}/{selectedBoxSize})
+                </a>
+              </div>
+
+              <button 
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                class="md:hidden p-2 text-brand-dark focus:outline-none"
+              >
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  {mobileMenuOpen ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                  )}
+                </svg>
+              </button>
             </div>
-            
-            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {FLAVORS.map(flavor => (
-                <div 
-                  key={flavor.id} 
-                  onClick={() => change3DColor(flavor.hex)}
-                  class={`p-6 rounded-2xl border ${flavor.color} transition-all hover:shadow-lg cursor-pointer flex flex-col justify-between space-y-4 group`}
-                >
-                  <div>
-                    <div class="flex justify-between items-center mb-1">
-                      <h3 class="text-xl font-bold">{flavor.name}</h3>
-                      <span class="text-xs bg-white/80 px-2 py-1 rounded-md text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">Skatīt 3D</span>
-                    </div>
-                    <p class="text-sm text-gray-700">{flavor.desc}</p>
-                  </div>
-                  <div class="flex justify-between items-center pt-2">
-                    <span class="font-bold text-lg">{flavor.price.toFixed(2)} € / gab.</span>
-                    <button 
-                      onClick={(e) => { e.stopPropagation(); addItem(flavor); }}
-                      disabled={totalItemsCount >= selectedBoxSize}
-                      class="bg-white text-brand-dark px-4 py-2 rounded-xl text-sm font-semibold shadow-sm hover:bg-brand-dark hover:text-white transition-all disabled:opacity-50"
+
+            {mobileMenuOpen && (
+              <div class="md:hidden bg-white border-b border-rose-100 px-4 pt-2 pb-6 space-y-3 animate-fade-in">
+                <a href="#hero" onClick={() => setMobileMenuOpen(false)} class="block py-2 text-sm font-medium">3D Makarūns</a>
+                <a href="#game-section" onClick={() => setMobileMenuOpen(false)} class="block py-2 text-sm font-medium">Spēle</a>
+                <a href="#flavors" onClick={() => setMobileMenuOpen(false)} class="block py-2 text-sm font-medium">Garšas</a>
+                <a href="#builder" onClick={() => setMobileMenuOpen(false)} class="block py-2 text-sm font-medium">Kastes salicējs</a>
+                <a href="#order" onClick={() => setMobileMenuOpen(false)} class="block py-2 text-sm font-medium">Pasūtīt</a>
+              </div>
+            )}
+          </header>
+
+          <!-- HERO SADAĻA: 3D Makarūns & Noskaņu maiņa -->
+          <section id="hero" class="py-16 md:py-20 max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
+            <div class="space-y-6">
+              <span class="text-xs uppercase tracking-widest text-brand-accent font-semibold bg-white/80 px-3 py-1 rounded-full inline-block shadow-sm">
+                Interaktīvs 3D dizains
+              </span>
+              <h1 class="text-5xl md:text-6xl font-bold leading-tight">
+                Izvēlieties savu dienas <span class="italic text-brand-accent">noskaņu</span>
+              </h1>
+              <p class="text-gray-600 text-lg">
+                Klikšķiniet uz pogām zemāk, lai mainītu lapas atmosfēru un 3D makarūna krāsu!
+              </p>
+
+              <!-- Noskaņu Pogas -->
+              <div class="space-y-2 pt-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-gray-500">Izvēlēties noskaņu:</span>
+                <div class="flex flex-wrap gap-3">
+                  {MOODS.map(mood => (
+                    <button
+                      key={mood.id}
+                      onClick={() => setActiveMood(mood)}
+                      class={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all shadow-sm ${
+                        activeMood.id === mood.id 
+                          ? 'bg-brand-dark text-white shadow-md scale-105' 
+                          : 'bg-white text-gray-700 hover:bg-gray-50'
+                      }`}
                     >
-                      + Pievienot
+                      {mood.name}
                     </button>
-                  </div>
+                  ))}
                 </div>
-              ))}
+              </div>
+            </div>
+
+            <!-- 3D Makarūna Konteiners -->
+            <div class="bg-white/60 backdrop-blur-md border border-white/80 rounded-3xl p-6 shadow-xl relative flex flex-col items-center justify-center">
+              <Macaron3D activeMood={activeMood} />
+              <p class="text-xs text-gray-400 mt-2">Interaktīvs 3D makarūna modelis</p>
             </div>
           </section>
 
-          <!-- Kastes konstruktors -->
-          <section id="builder" class="bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-rose-100 space-y-8">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-              <div>
-                <h2 class="text-3xl font-bold">Izveido Savu Kastīti</h2>
-                <p class="text-gray-600 text-sm">Izvēlies kastes izmēru un piepildi to ar savām mīļākajām garšām.</p>
+          <!-- SPĒLES SADAĻA (game.html caur iframe) -->
+          <section id="game-section" class="py-12 max-w-6xl mx-auto px-4">
+            <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-rose-100 space-y-6">
+              <div class="text-center space-y-2">
+                <h2 class="text-3xl font-bold">Makarūnu Spēle</h2>
+                <p class="text-gray-600 text-sm">Spēlējiet mūsu spēli tieši šeit un gūstiet patīkamas emocijas!</p>
               </div>
 
-              <div class="flex bg-brand-pink p-1.5 rounded-2xl gap-2">
-                {BOX_SIZES.map(box => (
-                  <button
-                    key={box.size}
-                    onClick={() => {
-                      setSelectedBoxSize(box.size);
-                      setBoxItems({});
-                    }}
-                    class={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                      selectedBoxSize === box.size 
-                        ? 'bg-white shadow-sm text-brand-dark font-bold' 
-                        : 'text-gray-600 hover:text-brand-dark'
-                    }`}
-                  >
-                    {box.label}
-                  </button>
-                ))}
+              <!-- Iframe ar spēli -->
+              <div class="w-full h-[450px] md:h-[550px] rounded-2xl overflow-hidden border border-gray-100 shadow-inner bg-gray-50">
+                <iframe 
+                  src="game.html" 
+                  class="w-full h-full border-0"
+                  title="Macaroon Game"
+                  allow="autoplay"
+                ></iframe>
               </div>
             </div>
+          </section>
 
-            <div class="space-y-2">
-              <div class="flex justify-between text-sm font-medium">
-                <span>Aizpildījums: {totalItemsCount} no {selectedBoxSize} gab.</span>
-                <span>{totalItemsCount === selectedBoxSize ? 'Kaste ir pilna! ✨' : `Varat pievienot vēl ${selectedBoxSize - totalItemsCount} gab.`}</span>
+          <!-- GALVENAIS SATURS (Garšas, Kastes salicējs, Forma) -->
+          <main class="max-w-6xl mx-auto px-4 py-12 space-y-20">
+            
+            <!-- Garšu Izvēle -->
+            <section id="flavors" class="space-y-8">
+              <div class="text-center space-y-3">
+                <h2 class="text-4xl font-bold">Mūsu Garšas</h2>
+                <p class="text-gray-600 max-w-xl mx-auto">Izvēlieties garšas un pievienojiet tās savai dāvanu kastei.</p>
               </div>
-              <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
-                <div 
-                  class="bg-brand-accent h-full transition-all duration-300"
-                  style={{ width: `${(totalItemsCount / selectedBoxSize) * 100}%` }}
-                ></div>
-              </div>
-            </div>
-
-            <div class="bg-brand-cream p-6 rounded-2xl space-y-4">
-              <h4 class="font-bold text-sm uppercase tracking-wider text-gray-500">Tavas kastes saturs</h4>
-              {Object.keys(boxItems).length === 0 ? (
-                <p class="text-gray-400 text-sm italic">Kaste pašlaik ir tukša. Izvēlieties garšas augstāk!</p>
-              ) : (
-                <div class="grid sm:grid-cols-2 gap-3">
-                  {Object.entries(boxItems).map(([id, count]) => {
-                    const flavor = FLAVORS.find(f => f.id === id);
-                    return (
-                      <div key={id} class="flex items-center justify-between bg-white p-3 rounded-xl shadow-sm">
-                        <span class="font-medium text-sm">{flavor?.name}</span>
-                        <div class="flex items-center gap-3">
-                          <button onClick={() => removeItem(id)} class="w-7 h-7 flex items-center justify-center bg-gray-100 rounded-lg hover:bg-rose-100 text-brand-dark font-bold">-</button>
-                          <span class="text-sm font-bold w-4 text-center">{count}</span>
-                          <button onClick={() => addItem(flavor)} disabled={totalItemsCount >= selectedBoxSize} class="w-7 h-7 flex items-center justify-center bg-gray-100 rounded-lg hover:bg-rose-100 text-brand-dark font-bold disabled:opacity-40">+</button>
+              
+              <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {FLAVORS.map(flavor => {
+                  const count = getItemCount(flavor.id);
+                  return (
+                    <div 
+                      key={flavor.id} 
+                      class={`p-6 rounded-2xl border ${flavor.color} transition-all hover:shadow-lg flex flex-col justify-between space-y-4 bg-white/80 backdrop-blur-sm`}
+                    >
+                      <div>
+                        <div class="flex items-center justify-between mb-2">
+                          <h3 class="text-xl font-bold">{flavor.name}</h3>
+                          <span class={`w-4 h-4 rounded-full ${flavor.circleBg} border border-white shadow-sm`}></span>
                         </div>
+                        <p class="text-sm opacity-90">{flavor.desc}</p>
+                      </div>
+                      <div class="flex justify-between items-center pt-2">
+                        <span class="font-bold text-lg">{flavor.price.toFixed(2)} € / gab.</span>
+                        
+                        <div class="flex items-center gap-2">
+                          {count > 0 && (
+                            <button 
+                              onClick={() => removeLastItemOfId(flavor.id)}
+                              class="w-8 h-8 rounded-xl bg-white text-brand-dark font-bold flex items-center justify-center shadow-sm"
+                            >
+                              -
+                            </button>
+                          )}
+                          {count > 0 && <span class="text-sm font-bold w-4 text-center">{count}</span>}
+                          <button 
+                            onClick={() => addItem(flavor)}
+                            disabled={boxItems.length >= selectedBoxSize}
+                            class="bg-brand-dark text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-sm hover:bg-brand-accent transition-all disabled:opacity-50"
+                          >
+                            + Pievienot
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+
+            <!-- Vizuālais Kastītes Salicējs -->
+            <section id="builder" class="bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-rose-100 space-y-8">
+              <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                  <h2 class="text-3xl font-bold">Kastītes Salicējs</h2>
+                  <p class="text-gray-600 text-sm">Izvēlieties kastītes ietilpību un piepildiet to.</p>
+                </div>
+
+                <div class="flex bg-brand-pink p-1.5 rounded-2xl gap-2">
+                  {BOX_SIZES.map(box => (
+                    <button
+                      key={box.size}
+                      onClick={() => {
+                        setSelectedBoxSize(box.size);
+                        setBoxItems([]);
+                      }}
+                      class={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                        selectedBoxSize === box.size 
+                          ? 'bg-white shadow-sm text-brand-dark font-bold' 
+                          : 'text-gray-600 hover:text-brand-dark'
+                      }`}
+                    >
+                      {box.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <div class="flex justify-between text-sm font-medium">
+                  <span>Aizpildījums: {boxItems.length} no {selectedBoxSize} gab.</span>
+                  <span>{boxItems.length === selectedBoxSize ? 'Kaste ir pilna! ✨' : `Varat pievienot vēl ${selectedBoxSize - boxItems.length} gab.`}</span>
+                </div>
+                <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+                  <div 
+                    class="bg-brand-accent h-full transition-all duration-300"
+                    style={{ width: `${(boxItems.length / selectedBoxSize) * 100}%` }}
+                  ></div>
+                </div>
+              </div>
+
+              <!-- VIZUĀLAIS KASTES TĪKLĀJS -->
+              <div class="bg-brand-pink/40 p-6 md:p-8 rounded-2xl border border-rose-100">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-4 text-center">Jūsu dāvanu kastes izkārtojums</h4>
+                
+                <div class={`grid ${currentBoxConfig.gridCols} gap-4 max-w-2xl mx-auto`}>
+                  {Array.from({ length: selectedBoxSize }).map((_, index) => {
+                    const item = boxItems[index];
+                    return (
+                      <div 
+                        key={index}
+                        class="aspect-square rounded-2xl border-2 border-dashed border-rose-200/80 bg-white/60 flex items-center justify-center relative group transition-all"
+                      >
+                        {item ? (
+                          <div 
+                            onClick={() => removeItemAtIndex(index)}
+                            title={`Klikšķiniet, lai izņemtu ${item.name}`}
+                            class={`w-4/5 h-4/5 rounded-full ${item.circleBg} shadow-md flex items-center justify-center cursor-pointer transform hover:scale-105 transition-all animate-pop-in relative border-2 border-white`}
+                          >
+                            <span class="text-[10px] font-bold text-brand-dark/70 opacity-0 group-hover:opacity-100 transition-opacity">✕</span>
+                          </div>
+                        ) : (
+                          <span class="text-xs text-rose-300 font-light">{index + 1}</span>
+                        )}
                       </div>
                     );
                   })}
                 </div>
-              )}
-            </div>
-          </section>
-
-          <!-- Pasūtījuma forma -->
-          <section id="order" class="max-w-2xl mx-auto bg-white p-8 md:p-10 rounded-3xl shadow-sm border border-rose-100 space-y-6">
-            <div class="text-center space-y-2">
-              <h2 class="text-3xl font-bold">Noformēt Pasūtījumu</h2>
-              <p class="text-gray-600 text-sm">Aizpildiet kontaktinformāciju un izvēlieties vēlamo saņemšanas datumu.</p>
-            </div>
-
-            {isSubmitted ? (
-              <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 p-6 rounded-2xl text-center space-y-3">
-                <h3 class="text-2xl font-bold font-serif">Paldies par pasūtījumu!</h3>
-                <p class="text-sm">Mēs esam saņēmuši jūsu pieteikumu un drīzumā sazināsimies, lai apstiprinātu detaļas un saņemšanas laiku.</p>
-                <button 
-                  onClick={() => { setIsSubmitted(false); setBoxItems({}); }}
-                  class="mt-4 bg-emerald-700 text-white px-6 py-2 rounded-xl text-sm font-medium hover:bg-emerald-800"
-                >
-                  Veikt jaunu pasūtījumu
-                </button>
               </div>
-            ) : (
+            </section>
+
+            <!-- Pasūtījuma Forma -->
+            <section id="order" class="max-w-2xl mx-auto bg-white p-8 md:p-10 rounded-3xl shadow-sm border border-rose-100 space-y-6">
+              <div class="text-center space-y-2">
+                <h2 class="text-3xl font-bold">Noformēt Pasūtījumu</h2>
+                <p class="text-gray-600 text-sm">Aizpildiet informāciju saņemšanai.</p>
+              </div>
+
               <form onSubmit={handleSubmit} class="space-y-4">
                 <div>
                   <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Vārds, Uzvārds</label>
@@ -354,7 +512,7 @@
 
                 <div class="grid sm:grid-cols-2 gap-4">
                   <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Tālruņa numurs</label>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Tālrunis</label>
                     <input 
                       type="tel" 
                       required 
@@ -369,7 +527,7 @@
                     <input 
                       type="email" 
                       required 
-                      placeholder="janis@piemērs.lv"
+                      placeholder="janis@gmail.com"
                       value={formData.email}
                       onChange={e => setFormData({...formData, email: e.target.value})}
                       class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-accent transition-colors"
@@ -378,7 +536,7 @@
                 </div>
 
                 <div>
-                  <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Vēlamais saņemšanas datums</label>
+                  <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Saņemšanas datums</label>
                   <input 
                     type="date" 
                     required 
@@ -389,10 +547,10 @@
                 </div>
 
                 <div>
-                  <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Piezīmes / Īpaši novēlējumi</label>
+                  <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Piezīmes</label>
                   <textarea 
                     rows="3" 
-                    placeholder="Norādiet papildu vēlmes..."
+                    placeholder="Papildu vēlmes vai saņemšanas detaļas..."
                     value={formData.notes}
                     onChange={e => setFormData({...formData, notes: e.target.value})}
                     class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-accent transition-colors"
@@ -401,19 +559,47 @@
 
                 <div class="pt-4 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
                   <div>
-                    <span class="text-xs text-gray-500 block">Kopējā summa:</span>
+                    <span class="text-xs text-gray-500 block">Kopējā summa (ar atlaidi):</span>
                     <span class="text-3xl font-bold text-brand-dark">{calculateTotal()} €</span>
                   </div>
                   <button 
                     type="submit"
                     class="w-full sm:w-auto bg-brand-dark text-white px-8 py-3.5 rounded-xl font-bold hover:bg-brand-accent transition-colors shadow-md"
                   >
-                    Apstiprināt pasūtījumu
+                    Nosūtīt pasūtījumu
                   </button>
                 </div>
               </form>
-            )}
-          </section>
+            </section>
+
+          </main>
+
+          <!-- VEIKSMES MODĀLAIS LOGS -->
+          {showModal && (
+            <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+              <div class="bg-white max-w-md w-full p-8 rounded-3xl shadow-2xl space-y-6 text-center transform animate-pop-in">
+                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">
+                  ✓
+                </div>
+                <div class="space-y-2">
+                  <h3 class="text-3xl font-serif font-bold text-brand-dark">Paldies par pasūtījumu!</h3>
+                  <p class="text-gray-600 text-sm">
+                    Mēs esam saņēmuši Jūsu pasūtījumu. Drīzumā sazināsimies uz e-pastu <strong>{formData.email}</strong>, lai apstiprinātu saņemšanas laiku.
+                  </p>
+                </div>
+                <button 
+                  onClick={() => {
+                    setShowModal(false);
+                    setBoxItems([]);
+                    setFormData({ name: '', phone: '', email: '', date: '', notes: '' });
+                  }}
+                  class="w-full bg-brand-dark text-white py-3.5 rounded-xl font-bold hover:bg-brand-accent transition-colors"
+                >
+                  Aizvērt un sākt no jauna
+                </button>
+              </div>
+            </div>
+          )}
 
         </div>
       );
@@ -421,107 +607,6 @@
 
     const root = ReactDOM.createRoot(document.getElementById('react-app'));
     root.render(<App />);
-  </script>
-
-  <!-- Three.js 3D Makarūna Inicializācija -->
-  <script>
-    window.addEventListener('DOMContentLoaded', () => {
-      const container = document.getElementById('canvas-container');
-      const canvas = document.getElementById('macaron-3d-canvas');
-
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-      camera.position.z = 6;
-
-      const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-      renderer.setSize(container.clientWidth, container.clientHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-      // Apgaismojums
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
-      scene.add(ambientLight);
-
-      const dirLight1 = new THREE.DirectionalLight(0xffffff, 0.8);
-      dirLight1.position.set(5, 5, 4);
-      scene.add(dirLight1);
-
-      const dirLight2 = new THREE.DirectionalLight(0xffd1dc, 0.5);
-      dirLight2.position.set(-5, -2, -2);
-      scene.add(dirLight2);
-
-      // Makarūna 3D Grupa
-      const macaronGroup = new THREE.Group();
-
-      // Materiāli
-      const shellMaterial = new THREE.MeshPhongMaterial({ 
-        color: 0xe65c82, 
-        shininess: 30,
-        flatShading: false
-      });
-
-      const creamMaterial = new THREE.MeshStandardMaterial({ 
-        color: 0xfffdd0, 
-        roughness: 0.3 
-      });
-
-      // Augšējā un apakšējā pusīte (Cilindrs ar noapaļotām malām izmantojot LatheGeometry)
-      const points = [];
-      for (let i = 0; i <= 10; i++) {
-        const a = (i / 10) * Math.PI * 0.5;
-        points.push(new THREE.Vector2(Math.sin(a) * 1.5, Math.cos(a) * 0.5));
-      }
-      const shellGeometry = new THREE.LatheGeometry(points, 32);
-
-      const topShell = new THREE.Mesh(shellGeometry, shellMaterial);
-      topShell.position.y = 0.25;
-
-      const bottomShell = new THREE.Mesh(shellGeometry, shellMaterial);
-      bottomShell.position.y = -0.25;
-      bottomShell.rotation.x = Math.PI;
-
-      // Pildījums (Krēms vidū)
-      const creamGeometry = new THREE.CylinderGeometry(1.35, 1.35, 0.35, 32);
-      const cream = new THREE.Mesh(creamGeometry, creamMaterial);
-
-      macaronGroup.add(topShell);
-      macaronGroup.add(bottomShell);
-      macaronGroup.add(cream);
-
-      // Nedaudz sagāžam sākuma leņķi
-      macaronGroup.rotation.x = 0.4;
-      macaronGroup.rotation.z = -0.2;
-
-      scene.add(macaronGroup);
-
-      // Krāsas maiņas funkcija ar maigu pāreju
-      let targetColor = new THREE.Color(0xe65c82);
-      window.update3DMacaronColor = function(hexColor) {
-        targetColor.setHex(hexColor);
-      };
-
-      // Animācijas cikls
-      function animate() {
-        requestAnimationFrame(animate);
-
-        // Lēna rotācija
-        macaronGroup.rotation.y += 0.008;
-
-        // Maiga krāsas pāreja (Interpolācija)
-        shellMaterial.color.lerp(targetColor, 0.05);
-
-        renderer.render(scene, camera);
-      }
-
-      animate();
-
-      // Responsīvs Canvas izmērs
-      window.addEventListener('resize', () => {
-        if (!container) return;
-        camera.aspect = container.clientWidth / container.clientHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(container.clientWidth, container.clientHeight);
-      });
-    });
   </script>
 </body>
 </html>
