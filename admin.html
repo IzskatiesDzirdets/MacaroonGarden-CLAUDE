@@ -28,7 +28,7 @@ body{background:#f0e8de;font-family:'DM Sans',sans-serif;color:var(--ink);displa
 .sb-link.active{background:rgba(232,164,184,.15);color:var(--rose);}
 .sb-link .ico{font-size:1rem;width:20px;text-align:center;}
 .sb-footer{padding:1rem 1.2rem;border-top:1px solid rgba(255,255,255,.08);}
-.sb-user{font-size:.72rem;color:rgba(255,255,255,.4);}
+.sb-user{font-size:.72rem;color:rgba(255,255,255,.4);word-break:break-all;}
 
 /* ── MAIN ── */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
@@ -115,9 +115,6 @@ tbody tr:hover{background:rgba(240,230,216,.4);}
 .ch-title{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:700;margin-bottom:.4rem;}
 .ch-meta{font-size:.75rem;color:#7a5a48;display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:.7rem;}
 .ch-footer{display:flex;align-items:center;justify-content:space-between;}
-.ch-progress{flex:1;margin-right:1rem;}
-.ch-progress-bar{height:6px;background:var(--sand);border-radius:3px;overflow:hidden;margin-top:.3rem;}
-.ch-progress-fill{height:100%;background:var(--rose-d);border-radius:3px;}
 
 /* ── AD PREVIEW ── */
 .ad-preview{background:linear-gradient(135deg,#E8A4B8,#C4B5D4);border-radius:14px;padding:1.2rem;text-align:center;color:#fff;margin-bottom:1rem;}
@@ -133,12 +130,10 @@ tbody tr:hover{background:rgba(240,230,216,.4);}
 .v-section:last-child{border-bottom:none;margin-bottom:0;}
 .v-label{font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7a5a48;display:block;margin-bottom:.5rem;}
 
-/* Flavor pills */
 .fl-pills{display:flex;flex-wrap:wrap;gap:.4rem;}
 .fl-pill{padding:.3rem .7rem;border-radius:999px;font-size:.75rem;font-weight:600;cursor:pointer;border:2px solid transparent;transition:all .15s;}
 .fl-pill.on{border-color:var(--ink);}
 
-/* Anim / format buttons */
 .seg{display:flex;gap:.3rem;}
 .seg-btn{flex:1;padding:.4rem;border-radius:8px;border:1.5px solid var(--sand);background:var(--bg);font-size:.72rem;font-weight:600;cursor:pointer;text-align:center;transition:all .15s;}
 .seg-btn.on{background:var(--rose-d);border-color:var(--rose-d);color:#fff;}
@@ -156,7 +151,7 @@ tbody tr:hover{background:rgba(240,230,216,.4);}
 /* ── AUTH SCREEN ── */
 .auth-screen{position:fixed;inset:0;background:var(--ink);display:flex;align-items:center;justify-content:center;z-index:999;}
 .auth-box{background:var(--white);border-radius:20px;padding:2.5rem;width:380px;text-align:center;}
-.auth-logo{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:700;margin-bottom:.3rem;}
+.auth-logo{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:700;margin-bottom:.3rem;color:var(--ink);}
 .auth-logo span{color:var(--rose-d);}
 .auth-sub{font-size:.82rem;color:#7a5a48;margin-bottom:2rem;}
 </style>
@@ -169,11 +164,11 @@ tbody tr:hover{background:rgba(240,230,216,.4);}
     <div class="auth-logo">Macaroon <span>Garden</span></div>
     <div class="auth-sub">Admin Panelis</div>
     <div class="field" style="margin-bottom:.8rem;text-align:left">
-      <label>E-pasts</label>
+      <label for="authEmail">E-pasts</label>
       <input type="email" id="authEmail" placeholder="admin@macaroongarden.lv">
     </div>
     <div class="field" style="margin-bottom:1.2rem;text-align:left">
-      <label>Parole</label>
+      <label for="authPass">Parole</label>
       <input type="password" id="authPass" placeholder="••••••••">
     </div>
     <button class="btn btn-primary" style="width:100%;padding:.8rem" onclick="doLogin()">Ielogoties →</button>
@@ -408,23 +403,23 @@ mākslas darbs</textarea>
     </div>
     <div class="form-grid">
       <div class="field form-full">
-        <label>Nosaukums</label>
+        <label for="ch-title">Nosaukums</label>
         <input type="text" id="ch-title" placeholder="Nedēļas macaronu čempions">
       </div>
       <div class="field form-full">
-        <label>Apraksts</label>
+        <label for="ch-desc">Apraksts</label>
         <textarea id="ch-desc" placeholder="Sakrāj vairāk rozā macaronu nekā jebkurš cits!"></textarea>
       </div>
       <div class="field">
-        <label>Sākums</label>
+        <label for="ch-start">Sākums</label>
         <input type="datetime-local" id="ch-start">
       </div>
       <div class="field">
-        <label>Beigas</label>
+        <label for="ch-end">Beigas</label>
         <input type="datetime-local" id="ch-end">
       </div>
       <div class="field">
-        <label>Mērķa tips</label>
+        <label for="ch-goal-type">Mērķa tips</label>
         <select id="ch-goal-type" onchange="toggleGoalColor()">
           <option value="score_endless">Punkti bezgalīgajā</option>
           <option value="levels_completed">Izpildīti līmeņi</option>
@@ -434,27 +429,27 @@ mākslas darbs</textarea>
         </select>
       </div>
       <div class="field">
-        <label>Mērķa vērtība</label>
+        <label for="ch-goal-val">Mērķa vērtība</label>
         <input type="number" id="ch-goal-val" placeholder="1000">
       </div>
       <div class="field" id="ch-color-field" style="display:none">
-        <label>Krāsas hex (tikai color_collected)</label>
+        <label for="ch-goal-color">Krāsas hex (tikai color_collected)</label>
         <input type="text" id="ch-goal-color" placeholder="#E8A4B8">
       </div>
       <div class="field">
-        <label>Uzvarētāju skaits</label>
+        <label for="ch-winners">Uzvarētāju skaits</label>
         <input type="number" id="ch-winners" value="1" min="1">
       </div>
       <div class="field form-full">
-        <label>Balvas apraksts (uzvarētājam)</label>
+        <label for="ch-reward-desc">Balvas apraksts (uzvarētājam)</label>
         <textarea id="ch-reward-desc" placeholder="Bezmaksas 12 macaronu kastīte pēc izvēles"></textarea>
       </div>
       <div class="field">
-        <label>Uzvarētāja e-pasta temats</label>
+        <label for="ch-win-subj">Uzvarētāja e-pasta temats</label>
         <input type="text" id="ch-win-subj" placeholder="🎉 Tu uzvarēji Macaroon Garden izaicinājumā!">
       </div>
       <div class="field form-full">
-        <label>Uzvarētāja e-pasta teksts</label>
+        <label for="ch-win-body">Uzvarētāja e-pasta teksts</label>
         <textarea id="ch-win-body" placeholder="Sveiki! Tu esi uzvarētājs..."></textarea>
       </div>
       <div class="field form-full">
@@ -464,11 +459,11 @@ mākslas darbs</textarea>
         </div>
       </div>
       <div class="field">
-        <label>Dalībnieku e-pasta temats</label>
+        <label for="ch-part-subj">Dalībnieku e-pasta temats</label>
         <input type="text" id="ch-part-subj" placeholder="Paldies par dalību!">
       </div>
       <div class="field form-full">
-        <label>Dalībnieku e-pasta teksts</label>
+        <label for="ch-part-body">Dalībnieku e-pasta teksts</label>
         <textarea id="ch-part-body" placeholder="Paldies, ka spēlēji! Šeit ir īpašs piedāvājums..."></textarea>
       </div>
     </div>
@@ -489,43 +484,43 @@ mākslas darbs</textarea>
     <div id="ad-preview-wrap"></div>
     <div class="form-grid">
       <div class="field form-full">
-        <label>Virsraksts</label>
+        <label for="ad-title">Virsraksts</label>
         <input type="text" id="ad-title" placeholder="🌸 Pasūtī savu kastīti!" oninput="updateAdPreview()">
       </div>
       <div class="field form-full">
-        <label>Teksts</label>
+        <label for="ad-body">Teksts</label>
         <textarea id="ad-body" placeholder="Svaigi cepti macaroni. Piegāde Rīgā 24h." oninput="updateAdPreview()"></textarea>
       </div>
       <div class="field">
-        <label>Attēla URL</label>
+        <label for="ad-image">Attēla URL</label>
         <input type="url" id="ad-image" placeholder="https://...">
       </div>
       <div class="field">
-        <label>CTA poga teksts</label>
+        <label for="ad-cta">CTA poga teksts</label>
         <input type="text" id="ad-cta" placeholder="Pasūtīt tagad" oninput="updateAdPreview()">
       </div>
       <div class="field form-full">
-        <label>CTA saite</label>
+        <label for="ad-url">CTA saite</label>
         <input type="text" id="ad-url" placeholder="index.html#box">
       </div>
       <div class="field">
-        <label>Rādīt pēc līmeņa #</label>
+        <label for="ad-after-level">Rādīt pēc līmeņa #</label>
         <input type="number" id="ad-after-level" placeholder="0 = no sākuma">
       </div>
       <div class="field">
-        <label>Rādīt ik pēc N līmeņiem</label>
+        <label for="ad-every-n">Rādīt ik pēc N līmeņiem</label>
         <input type="number" id="ad-every-n" value="3">
       </div>
       <div class="field">
-        <label>Aktīvs no</label>
+        <label for="ad-from">Aktīvs no</label>
         <input type="datetime-local" id="ad-from">
       </div>
       <div class="field">
-        <label>Aktīvs līdz</label>
+        <label for="ad-until">Aktīvs līdz</label>
         <input type="datetime-local" id="ad-until">
       </div>
       <div class="field">
-        <label>Automātiska aizvēršana (sek)</label>
+        <label for="ad-duration">Automātiska aizvēršana (sek)</label>
         <input type="number" id="ad-duration" value="5">
       </div>
       <div class="field">
@@ -551,35 +546,35 @@ mākslas darbs</textarea>
     </div>
     <div class="form-grid">
       <div class="field">
-        <label>Kods</label>
+        <label for="dc-code">Kods</label>
         <input type="text" id="dc-code" placeholder="SUMMER20" style="text-transform:uppercase">
       </div>
       <div class="field">
-        <label>Tips</label>
+        <label for="dc-type">Tips</label>
         <select id="dc-type">
           <option value="percent">Procenti (%)</option>
           <option value="fixed">Fiksēta summa (€)</option>
         </select>
       </div>
       <div class="field">
-        <label>Vērtība</label>
+        <label for="dc-value">Vērtība</label>
         <input type="number" id="dc-value" placeholder="20">
       </div>
       <div class="field">
-        <label>Min. pasūtījums (€)</label>
+        <label for="dc-min">Min. pasūtījums (€)</label>
         <input type="number" id="dc-min" value="0">
       </div>
       <div class="field">
-        <label>Max lietojumu skaits</label>
+        <label for="dc-max-uses">Max lietojumu skaits</label>
         <input type="number" id="dc-max-uses" placeholder="Atstāj tukšu = neierobežots">
       </div>
       <div class="field">
-        <label>Derīgs līdz</label>
+        <label for="dc-until">Derīgs līdz</label>
         <input type="datetime-local" id="dc-until">
       </div>
       <div class="field form-full">
-        <label>Piezīme (admin)</label>
-        <input type="text" id="dc-desc" placeholder="Vasaras kampaņa 2025">
+        <label for="dc-desc">Piezīme (admin)</label>
+        <input type="text" id="dc-desc" placeholder="Vasaras kampaņa 2026">
       </div>
       <div class="field form-full">
         <div class="toggle-row">
@@ -624,18 +619,31 @@ async function initAuth() {
   const { data: { session } } = await sb.auth.getSession();
   if(session) { currentUser = session.user; showAdmin(); }
   else document.getElementById('authScreen').style.display = 'flex';
+  
   sb.auth.onAuthStateChange((_, s) => {
     currentUser = s?.user || null;
-    if(currentUser) showAdmin(); else location.reload();
+    if(currentUser) {
+      showAdmin();
+    } else {
+      document.getElementById('authScreen').style.display = 'flex';
+    }
   });
 }
+
 async function doLogin() {
   const email = document.getElementById('authEmail').value;
   const pass = document.getElementById('authPass').value;
+  document.getElementById('authError').textContent = '';
+  
   const { error } = await sb.auth.signInWithPassword({ email, password: pass });
   if(error) document.getElementById('authError').textContent = 'Nepareizs e-pasts vai parole';
 }
-async function doLogout() { await sb.auth.signOut(); location.reload(); }
+
+async function doLogout() { 
+  await sb.auth.signOut(); 
+  location.reload(); 
+}
+
 function showAdmin() {
   document.getElementById('authScreen').style.display = 'none';
   document.getElementById('sbUser').textContent = currentUser?.email || '';
@@ -661,16 +669,23 @@ const panelTitles = {
   ads:'Spēles reklāmas', products:'Produkti', discounts:'Atlaižu kodi',
   orders:'Pasūtījumi', video:'Video ģenerātors', emails:'E-pasta žurnāls'
 };
+
 function nav(id) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sb-link').forEach(l => l.classList.remove('active'));
-  document.getElementById('p-'+id).classList.add('active');
-  document.querySelector(`.sb-link[onclick="nav('${id}')"]`).classList.add('active');
-  document.getElementById('topbarTitle').textContent = panelTitles[id];
+  
+  const targetPanel = document.getElementById('p-'+id);
+  if(targetPanel) targetPanel.classList.add('active');
+  
+  const navBtn = document.querySelector(`.sb-link[onclick="nav('${id}')"]`);
+  if(navBtn) navBtn.classList.add('active');
+  
+  document.getElementById('topbarTitle').textContent = panelTitles[id] || 'Panelis';
   currentPanel = id;
   setupTopbarActions(id);
   if(panelLoaders[id]) panelLoaders[id]();
 }
+
 function setupTopbarActions(id) {
   const acts = document.getElementById('topbarActions');
   const btns = {
@@ -684,7 +699,8 @@ function setupTopbarActions(id) {
 // ── TOAST ──
 function toast(msg, type='') {
   const t = document.getElementById('toast');
-  t.textContent = msg; t.className = 'toast show ' + type;
+  t.textContent = msg; 
+  t.className = 'toast show ' + type;
   setTimeout(() => t.classList.remove('show'), 2200);
 }
 
@@ -710,24 +726,30 @@ async function loadDashboard() {
   document.getElementById('db-challenges').textContent = challenges?.length ?? '—';
 
   const chList = document.getElementById('db-challenge-list');
-  if(!challenges?.length) { chList.innerHTML = '<div style="color:#7a5a48;font-size:.85rem">Nav aktīvu izaicinājumu</div>'; }
-  else chList.innerHTML = challenges.slice(0,3).map(c => `
-    <div style="padding:.6rem 0;border-bottom:1px solid var(--sand)">
-      <div style="font-weight:600;font-size:.85rem">${c.title}</div>
-      <div style="font-size:.72rem;color:#7a5a48">Beidzas: ${fmtDate(c.ends_at)}</div>
-    </div>`).join('');
+  if(!challenges?.length) { 
+    chList.innerHTML = '<div style="color:#7a5a48;font-size:.85rem">Nav aktīvu izaicinājumu</div>'; 
+  } else {
+    chList.innerHTML = challenges.slice(0,3).map(c => `
+      <div style="padding:.6rem 0;border-bottom:1px solid var(--sand)">
+        <div style="font-weight:600;font-size:.85rem">${c.title}</div>
+        <div style="font-size:.72rem;color:#7a5a48">Beidzas: ${fmtDate(c.ends_at)}</div>
+      </div>`).join('');
+  }
 
   const { data: recentOrders } = await sb.from('orders').select('*').order('created_at', { ascending:false }).limit(5);
   const orList = document.getElementById('db-order-list');
-  if(!recentOrders?.length) { orList.innerHTML = '<div style="color:#7a5a48;font-size:.85rem">Nav pasūtījumu</div>'; }
-  else orList.innerHTML = recentOrders.map(o => `
-    <div style="padding:.6rem 0;border-bottom:1px solid var(--sand);display:flex;justify-content:space-between;align-items:center">
-      <div>
-        <div style="font-weight:600;font-size:.85rem">${o.customer_name || 'Anonīms'}</div>
-        <div style="font-size:.72rem;color:#7a5a48">${fmtDate(o.created_at)}</div>
-      </div>
-      <div>${fmtPrice(o.total)}</div>
-    </div>`).join('');
+  if(!recentOrders?.length) { 
+    orList.innerHTML = '<div style="color:#7a5a48;font-size:.85rem">Nav pasūtījumu</div>'; 
+  } else {
+    orList.innerHTML = recentOrders.map(o => `
+      <div style="padding:.6rem 0;border-bottom:1px solid var(--sand);display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-weight:600;font-size:.85rem">${o.customer_name || 'Anonīms'}</div>
+          <div style="font-size:.72rem;color:#7a5a48">${fmtDate(o.created_at)}</div>
+        </div>
+        <div>${fmtPrice(o.total)}</div>
+      </div>`).join('');
+  }
 }
 
 // ── CHALLENGES ──
@@ -735,7 +757,10 @@ let editingChallengeId = null;
 async function loadChallenges() {
   const { data } = await sb.from('challenges').select('*').order('created_at', { ascending:false });
   const el = document.getElementById('ch-list');
-  if(!data?.length) { el.innerHTML = '<div class="card" style="text-align:center;color:#7a5a48">Nav izaicinājumu. <button class="btn btn-primary btn-sm" onclick="openChallengeModal()">Izveidot pirmo</button></div>'; return; }
+  if(!data?.length) { 
+    el.innerHTML = '<div class="card" style="text-align:center;color:#7a5a48">Nav izaicinājumu. <button class="btn btn-primary btn-sm" onclick="openChallengeModal()">Izveidot pirmo</button></div>'; 
+    return; 
+  }
   const goalLabels = { score_endless:'Punkti bezgalīgajā', levels_completed:'Izpildīti līmeņi', color_collected:'Krāsas macaroni', min_moves_score:'Punkti/min. gājieni', fewest_moves_win:'Līmeņi/min. gājieni' };
   const now = new Date();
   el.innerHTML = data.map(c => {
@@ -763,10 +788,11 @@ async function loadChallenges() {
     </div>`;
   }).join('');
 }
+
 function openChallengeModal(data=null) {
   editingChallengeId = data?.id || null;
   document.getElementById('ch-modal-title').textContent = data ? 'Labot izaicinājumu' : 'Jauns izaicinājums';
-  ['title','desc','goal-val','goal-color','win-subj','win-body','part-subj','part-body'].forEach(k => {
+  ['title','desc','goal-val','goal-color','win-subj','win-body','part-subj','part-body','reward-desc'].forEach(k => {
     const el = document.getElementById('ch-'+k);
     if(el) el.value = data?.[k.replace('-','_')] ?? '';
   });
@@ -776,28 +802,38 @@ function openChallengeModal(data=null) {
     document.getElementById('ch-notify-all').checked = data.notify_all_participants || false;
     if(data.starts_at) document.getElementById('ch-start').value = data.starts_at.slice(0,16);
     if(data.ends_at) document.getElementById('ch-end').value = data.ends_at.slice(0,16);
+  } else {
+    document.getElementById('ch-goal-type').value = 'score_endless';
+    document.getElementById('ch-winners').value = 1;
+    document.getElementById('ch-notify-all').checked = false;
+    document.getElementById('ch-start').value = '';
+    document.getElementById('ch-end').value = '';
   }
   toggleGoalColor();
   openModal('ch-modal');
 }
+
 function toggleGoalColor() {
   document.getElementById('ch-color-field').style.display =
     document.getElementById('ch-goal-type').value === 'color_collected' ? 'flex' : 'none';
 }
+
 async function editChallenge(id) {
   const { data } = await sb.from('challenges').select('*').eq('id',id).single();
   openChallengeModal(data);
 }
+
 async function saveChallenge() {
   const payload = {
     title: document.getElementById('ch-title').value,
     description: document.getElementById('ch-desc').value,
-    starts_at: document.getElementById('ch-start').value,
-    ends_at: document.getElementById('ch-end').value,
+    starts_at: document.getElementById('ch-start').value || null,
+    ends_at: document.getElementById('ch-end').value || null,
     goal_type: document.getElementById('ch-goal-type').value,
-    goal_value: parseInt(document.getElementById('ch-goal-val').value),
+    goal_value: parseInt(document.getElementById('ch-goal-val').value) || 0,
     goal_color: document.getElementById('ch-goal-color').value || null,
     winner_count: parseInt(document.getElementById('ch-winners').value) || 1,
+    reward_description: document.getElementById('ch-reward-desc').value,
     notify_all_participants: document.getElementById('ch-notify-all').checked,
     winner_email_subject: document.getElementById('ch-win-subj').value,
     winner_email_body: document.getElementById('ch-win-body').value,
@@ -813,25 +849,29 @@ async function saveChallenge() {
   closeModal('ch-modal');
   loadChallenges();
 }
+
 async function toggleChallenge(id, val) {
   await sb.from('challenges').update({ active: val }).eq('id', id);
   toast(val ? 'Aktivizēts' : 'Deaktivizēts');
 }
+
 async function deleteChallenge(id) {
   if(!confirm('Dzēst izaicinājumu?')) return;
   await sb.from('challenges').delete().eq('id', id);
   toast('Dzēsts', 'success');
   loadChallenges();
 }
+
 async function announceWinners(challengeId) {
   const { data: ch } = await sb.from('challenges').select('*').eq('id', challengeId).single();
+  if(!ch) return;
   const { data: participants } = await sb.from('challenge_participants')
     .select('*, profile:user_id(email)').eq('challenge_id', challengeId)
     .order('current_value', { ascending: false }).limit(ch.winner_count);
   if(!participants?.length) { toast('Nav dalībnieku', 'error'); return; }
-  // Log emails to send
+  
   const emails = participants.map(p => ({
-    to_email: p.profile?.email || 'unknown',
+    to_email: p.profile?.email || 'nezināms',
     subject: ch.winner_email_subject || '🎉 Tu uzvarēji!',
     type: 'winner',
     challenge_id: challengeId,
@@ -848,6 +888,7 @@ async function loadLeaderboard() {
   lbData = data || [];
   renderLb(lbData);
 }
+
 function renderLb(data) {
   document.getElementById('lb-body').innerHTML = data.map((r,i) => `
     <tr>
@@ -858,6 +899,7 @@ function renderLb(data) {
       <td>${r.total_moves ?? '—'}</td>
     </tr>`).join('');
 }
+
 function filterLb(q) {
   renderLb(q ? lbData.filter(r => (r.display_name||'').toLowerCase().includes(q.toLowerCase())) : lbData);
 }
@@ -889,11 +931,12 @@ async function loadAds() {
       </div>
     </div>`).join('') + '</div>';
 }
+
 function openAdModal(data=null) {
   editingAdId = data?.id || null;
   document.getElementById('ad-modal-title').textContent = data ? 'Labot reklāmu' : 'Jauna reklāma';
   ['title','body','image','cta','url'].forEach(k => {
-    document.getElementById('ad-'+k).value = data?.[k === 'url' ? 'cta_url' : k === 'cta' ? 'cta_text' : k] ?? '';
+    document.getElementById('ad-'+k).value = data?.[k === 'url' ? 'cta_url' : k === 'cta' ? 'cta_text' : k === 'image' ? 'image_url' : k] ?? '';
   });
   if(data) {
     document.getElementById('ad-after-level').value = data.show_after_level ?? '';
@@ -902,10 +945,18 @@ function openAdModal(data=null) {
     document.getElementById('ad-active').checked = data.active ?? true;
     if(data.active_from) document.getElementById('ad-from').value = data.active_from.slice(0,16);
     if(data.active_until) document.getElementById('ad-until').value = data.active_until.slice(0,16);
+  } else {
+    document.getElementById('ad-after-level').value = '';
+    document.getElementById('ad-every-n').value = 3;
+    document.getElementById('ad-duration').value = 5;
+    document.getElementById('ad-active').checked = true;
+    document.getElementById('ad-from').value = '';
+    document.getElementById('ad-until').value = '';
   }
   updateAdPreview();
   openModal('ad-modal');
 }
+
 function updateAdPreview() {
   const title = document.getElementById('ad-title').value;
   const body = document.getElementById('ad-body').value;
@@ -917,10 +968,12 @@ function updateAdPreview() {
       ${cta ? `<span class="ad-preview-cta">${cta}</span>` : ''}
     </div>`;
 }
+
 async function editAd(id) {
   const { data } = await sb.from('game_ads').select('*').eq('id',id).single();
   openAdModal(data);
 }
+
 async function saveAd() {
   const payload = {
     title: document.getElementById('ad-title').value,
@@ -943,6 +996,7 @@ async function saveAd() {
   closeModal('ad-modal');
   loadAds();
 }
+
 async function deleteAd(id) {
   if(!confirm('Dzēst reklāmu?')) return;
   await sb.from('game_ads').delete().eq('id', id);
@@ -960,6 +1014,7 @@ const prodConfig = {
   addons:  { table:'addons',       title:'Papildpakalpojums', fields:[{k:'name',l:'Nosaukums'},{k:'description',l:'Apraksts',t:'textarea'},{k:'price',l:'Cena (€)',t:'number'},{k:'image_url',l:'Attēla URL'},{k:'active',l:'Aktīvs',t:'toggle'},{k:'sort_order',l:'Kārtība',t:'number'}] },
   flavors: { table:'flavors',      title:'Garša', fields:[{k:'key',l:'Atslēga (rose/lemon...)'},{k:'name',l:'Nosaukums'},{k:'emoji',l:'Emoji'},{k:'description',l:'Apraksts',t:'textarea'},{k:'color_bg',l:'Fona krāsa (hex)'},{k:'color_text',l:'Teksta krāsa (hex)'},{k:'active',l:'Aktīvs',t:'toggle'},{k:'sort_order',l:'Kārtība',t:'number'}] },
 };
+
 async function prodTab(tab) {
   currentProdTab = tab;
   document.querySelectorAll('.prod-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
@@ -978,21 +1033,24 @@ async function prodTab(tab) {
         <button class="btn btn-danger btn-sm" onclick="deleteProd('${r.id}')">🗑️</button>
       </div></td></tr>`).join('')}</tbody></table></div>`;
 }
+
 function openProdModal(data=null) {
   editingProdId = data?.id || null;
   const cfg = prodConfig[currentProdTab];
   document.getElementById('prod-modal-title').textContent = (data ? 'Labot' : 'Jauns') + ': ' + cfg.title;
   document.getElementById('prod-modal-body').innerHTML = `<div class="form-grid">${cfg.fields.map(f => {
     if(f.t === 'toggle') return `<div class="field form-full"><div class="toggle-row"><span class="toggle-label">${f.l}</span><label class="toggle"><input type="checkbox" id="pf-${f.k}" ${data?.[f.k]!==false?'checked':''}><span class="toggle-sl"></span></label></div></div>`;
-    if(f.t === 'textarea') return `<div class="field form-full"><label>${f.l}</label><textarea id="pf-${f.k}">${data?.[f.k]||''}</textarea></div>`;
-    return `<div class="field"><label>${f.l}</label><input type="${f.t||'text'}" id="pf-${f.k}" value="${data?.[f.k]??''}"></div>`;
+    if(f.t === 'textarea') return `<div class="field form-full"><label for="pf-${f.k}">${f.l}</label><textarea id="pf-${f.k}">${data?.[f.k]||''}</textarea></div>`;
+    return `<div class="field"><label for="pf-${f.k}">${f.l}</label><input type="${f.t||'text'}" id="pf-${f.k}" value="${data?.[f.k]??''}"></div>`;
   }).join('')}</div>`;
   openModal('prod-modal');
 }
+
 async function editProd(id) {
   const { data } = await sb.from(prodConfig[currentProdTab].table).select('*').eq('id',id).single();
   openProdModal(data);
 }
+
 async function saveProd() {
   const cfg = prodConfig[currentProdTab];
   const payload = {};
@@ -1009,6 +1067,7 @@ async function saveProd() {
   closeModal('prod-modal');
   prodTab(currentProdTab);
 }
+
 async function deleteProd(id) {
   if(!confirm('Dzēst?')) return;
   await sb.from(prodConfig[currentProdTab].table).delete().eq('id', id);
@@ -1024,7 +1083,7 @@ async function loadDiscounts() {
     <td><b>${d.code}</b></td>
     <td>${d.type === 'percent' ? 'Procenti' : 'Fiksēts'}</td>
     <td><b>${d.type === 'percent' ? d.value + '%' : '€' + d.value}</b></td>
-    <td>${d.used_count} ${d.max_uses ? '/ ' + d.max_uses : ''}</td>
+    <td>${d.used_count ?? 0} ${d.max_uses ? '/ ' + d.max_uses : ''}</td>
     <td>${d.valid_until ? fmtDate(d.valid_until) : '∞'}</td>
     <td>${d.active ? badge('Aktīvs','green') : badge('Neaktīvs','red')}</td>
     <td><div style="display:flex;gap:.3rem">
@@ -1032,6 +1091,7 @@ async function loadDiscounts() {
       <button class="btn btn-danger btn-sm" onclick="deleteDiscount('${d.id}')">🗑️</button>
     </div></td></tr>`).join('');
 }
+
 function openDiscountModal(data=null) {
   editingDiscId = data?.id || null;
   document.getElementById('dc-code').value = data?.code || '';
@@ -1041,18 +1101,20 @@ function openDiscountModal(data=null) {
   document.getElementById('dc-max-uses').value = data?.max_uses || '';
   document.getElementById('dc-desc').value = data?.description || '';
   document.getElementById('dc-active').checked = data?.active ?? true;
-  if(data?.valid_until) document.getElementById('dc-until').value = data.valid_until.slice(0,16);
+  document.getElementById('dc-until').value = data?.valid_until ? data.valid_until.slice(0,16) : '';
   openModal('disc-modal');
 }
+
 async function editDiscount(id) {
   const { data } = await sb.from('discount_codes').select('*').eq('id',id).single();
   openDiscountModal(data);
 }
+
 async function saveDiscount() {
   const payload = {
     code: document.getElementById('dc-code').value.toUpperCase(),
     type: document.getElementById('dc-type').value,
-    value: parseFloat(document.getElementById('dc-value').value),
+    value: parseFloat(document.getElementById('dc-value').value) || 0,
     min_order: parseFloat(document.getElementById('dc-min').value) || 0,
     max_uses: parseInt(document.getElementById('dc-max-uses').value) || null,
     valid_until: document.getElementById('dc-until').value || null,
@@ -1067,6 +1129,7 @@ async function saveDiscount() {
   closeModal('disc-modal');
   loadDiscounts();
 }
+
 async function deleteDiscount(id) {
   if(!confirm('Dzēst kodu?')) return;
   await sb.from('discount_codes').delete().eq('id', id);
@@ -1082,7 +1145,7 @@ async function loadOrders() {
   const { data } = await q;
   const statusBadge = { pending: badge('Gaida','gold'), confirmed: badge('Apstiprināts','green'), delivered: badge('Piegādāts','blue') };
   document.getElementById('orders-body').innerHTML = (data||[]).map(o => `<tr>
-    <td style="font-size:.72rem;opacity:.6">${o.id.slice(0,8)}...</td>
+    <td style="font-size:.72rem;opacity:.6">${o.id ? o.id.slice(0,8) : ''}...</td>
     <td><div style="font-weight:600">${o.customer_name||'—'}</div><div style="font-size:.72rem;color:#7a5a48">${o.customer_email||''}</div></td>
     <td style="font-size:.82rem">${o.flavors?.length || 0} garša(s)</td>
     <td><b>${fmtPrice(o.total)}</b></td>
@@ -1094,6 +1157,7 @@ async function loadOrders() {
       <option ${o.status==='delivered'?'selected':''} value="delivered">Piegādāts</option>
     </select></td></tr>`).join('');
 }
+
 function filterOrders(v) { ordersFilter = v; loadOrders(); }
 async function updateOrderStatus(id, status) {
   await sb.from('orders').update({ status }).eq('id', id);
@@ -1113,7 +1177,13 @@ async function loadEmails() {
 }
 
 // ── VIDEO ──
-const VF = { rose:{name:'Rozā & Aveņu',emoji:'🌹',bg:['#F2C4D4','#E8A4B8','#C97A96'],accent:'#C97A96',text:'#4a0f28',orbs:['#F2C4D4','#E8A4B8','#C97A96','#F7D6E4']},lavender:{name:'Lavandas',emoji:'💜',bg:['#D4C4E8','#C4B5D4','#9B86C2'],accent:'#9B86C2',text:'#2d1560',orbs:['#D4C4E8','#C4B5D4','#9B86C2','#E0D4F0']},mint:{name:'Piparmētru',emoji:'🌿',bg:['#C4DFC8','#A8D4B0','#6BAF78'],accent:'#6BAF78',text:'#1a4228',orbs:['#C4DFC8','#A8D4B0','#6BAF78','#D8EED8']},chocolate:{name:'Šokolādes',emoji:'🍫',bg:['#D4A87A','#C4956A','#8B5E3C'],accent:'#8B5E3C',text:'#3a1800',orbs:['#D4A87A','#C4956A','#8B5E3C','#E0C09A']},lemon:{name:'Citrona',emoji:'🍋',bg:['#EEEE70','#E8E840','#C8C800'],accent:'#B8A800',text:'#3a3a00',orbs:['#EEEE70','#E8E840','#C8C800','#F4F490']}};
+const VF = { 
+  rose:{name:'Rozā & Aveņu',emoji:'🌹',bg:['#F2C4D4','#E8A4B8','#C97A96'],accent:'#C97A96',text:'#4a0f28',orbs:['#F2C4D4','#E8A4B8','#C97A96','#F7D6E4']},
+  lavender:{name:'Lavandas',emoji:'💜',bg:['#D4C4E8','#C4B5D4','#9B86C2'],accent:'#9B86C2',text:'#2d1560',orbs:['#D4C4E8','#C4B5D4','#9B86C2','#E0D4F0']},
+  mint:{name:'Piparmētru',emoji:'🌿',bg:['#C4DFC8','#A8D4B0','#6BAF78'],accent:'#6BAF78',text:'#1a4228',orbs:['#C4DFC8','#A8D4B0','#6BAF78','#D8EED8']},
+  chocolate:{name:'Šokolādes',emoji:'🍫',bg:['#D4A87A','#C4956A','#8B5E3C'],accent:'#8B5E3C',text:'#3a1800',orbs:['#D4A87A','#C4956A','#8B5E3C','#E0C09A']},
+  lemon:{name:'Citrona',emoji:'🍋',bg:['#EEEE70','#E8E840','#C8C800'],accent:'#B8A800',text:'#3a3a00',orbs:['#EEEE70','#E8E840','#C8C800','#F4F490']}
+};
 const VFMT = { reels:{w:1080,h:1920,fr:150,comp:'MacaronReels'}, story:{w:1080,h:1920,fr:120,comp:'MacaronStory'}, square:{w:1080,h:1080,fr:120,comp:'MacaronSquare'} };
 let vState = { flavor:'rose', fmt:'reels', anim:'float', title:'Katrs macarons —\nmākslas darbs', sub:'Svaigi cepti Rīgā · Piegāde 24h', cta:'Pasūtīt: info@macaroongarden.lv', frame:0, playing:false };
 let vAF = null, vLast = null;
@@ -1127,12 +1197,48 @@ function initVideo() {
   vDraw();
   vPlay();
 }
-function vFlav(k,btn){vState.flavor=k;document.querySelectorAll('.fl-pill').forEach(b=>b.classList.remove('on'));btn.classList.add('on');vUpdateCmd();if(!vState.playing)vDraw();}
-function vFmt(k,btn){vState.fmt=k;document.querySelectorAll('.seg-btn[data-fmt]').forEach(b=>b.classList.remove('on'));btn.classList.add('on');vState.frame=0;vResizeCanvas();vUpdateCmd();if(!vState.playing)vDraw();}
-function vAnim(k,btn){vState.anim=k;document.querySelectorAll('.seg-btn:not([data-fmt])').forEach(b=>b.classList.remove('on'));btn.classList.add('on');vUpdateCmd();}
-function vUpdate(){vState.title=document.getElementById('v-title').value;vState.sub=document.getElementById('v-sub').value;vState.cta=document.getElementById('v-cta').value;vUpdateCmd();if(!vState.playing)vDraw();}
-function vUpdateCmd(){const fmt=VFMT[vState.fmt];document.getElementById('v-cmd').textContent=`npx remotion render ${fmt.comp} out/${vState.flavor}-${vState.fmt}.mp4 --props='{"flavor":"${vState.flavor}","animStyle":"${vState.anim}","title":"${vState.title.replace(/\n/g,'\\n')}","subtitle":"${vState.sub}","cta":"${vState.cta}","showLogo":true,"logoText":"Macaroon Garden"}'`;}
-function copyCmd(){navigator.clipboard.writeText(document.getElementById('v-cmd').textContent).then(()=>toast('Kopēts!','success'));}
+
+function vFlav(k,btn){
+  vState.flavor=k;
+  document.querySelectorAll('.fl-pill').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  vUpdateCmd();
+  if(!vState.playing)vDraw();
+}
+
+function vFmt(k,btn){
+  vState.fmt=k;
+  document.querySelectorAll('.seg-btn[data-fmt]').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  vState.frame=0;
+  vResizeCanvas();
+  vUpdateCmd();
+  if(!vState.playing)vDraw();
+}
+
+function vAnim(k,btn){
+  vState.anim=k;
+  document.querySelectorAll('.seg-btn:not([data-fmt])').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  vUpdateCmd();
+}
+
+function vUpdate(){
+  vState.title=document.getElementById('v-title').value;
+  vState.sub=document.getElementById('v-sub').value;
+  vState.cta=document.getElementById('v-cta').value;
+  vUpdateCmd();
+  if(!vState.playing)vDraw();
+}
+
+function vUpdateCmd(){
+  const fmt=VFMT[vState.fmt];
+  document.getElementById('v-cmd').textContent=`npx remotion render ${fmt.comp} out/${vState.flavor}-${vState.fmt}.mp4 --props='{"flavor":"${vState.flavor}","animStyle":"${vState.anim}","title":"${vState.title.replace(/\n/g,'\\n')}","subtitle":"${vState.sub}","cta":"${vState.cta}","showLogo":true,"logoText":"Macaroon Garden"}'`;
+}
+
+function copyCmd(){
+  navigator.clipboard.writeText(document.getElementById('v-cmd').textContent).then(()=>toast('Kopēts!','success'));
+}
 
 function vResizeCanvas(){
   const fmt=VFMT[vState.fmt];
@@ -1148,7 +1254,12 @@ function vResizeCanvas(){
   outer.style.width=cw+'px';outer.style.height=ch+'px';
 }
 
-function spSolve(fr,k=100,d=18){if(fr<=0)return 0;const w=Math.sqrt(k),dm=d/(2*w),wd=w*Math.sqrt(Math.max(0,1-dm*dm)),t=fr/30;return dm<1?1-Math.exp(-dm*w*t)*(Math.cos(wd*t)+(dm*w/wd)*Math.sin(wd*t)):1-Math.exp(-w*t)*(1+w*t);}
+function spSolve(fr,k=100,d=18){
+  if(fr<=0)return 0;
+  const w=Math.sqrt(k),dm=d/(2*w),wd=w*Math.sqrt(Math.max(0,1-dm*dm)),t=fr/30;
+  return dm<1?1-Math.exp(-dm*w*t)*(Math.cos(wd*t)+(dm*w/wd)*Math.sin(wd*t)):1-Math.exp(-w*t)*(1+w*t);
+}
+
 function ilerp(v,a,b,c,e){return c+(e-c)*Math.max(0,Math.min(1,(v-a)/(b-a)));}
 
 function vDraw(){
@@ -1162,6 +1273,7 @@ function vDraw(){
   const g=ctx.createLinearGradient(0,0,FW,FH);
   g.addColorStop(0,f.bg[0]);g.addColorStop(.5,f.bg[1]);g.addColorStop(1,f.bg[2]);
   ctx.fillStyle=g;ctx.fillRect(0,0,FW,FH);
+
   // Orbs
   orbs.forEach(o=>{
     const t=Math.max(0,fr-o.dl);
@@ -1172,6 +1284,7 @@ function vDraw(){
     ctx.beginPath();ctx.arc((o.x/100)*FW,(yp/100)*FH,(o.sz/1920)*FH*sc2,0,Math.PI*2);
     ctx.fillStyle=f.orbs[o.ci];ctx.fill();ctx.restore();
   });
+
   // Overlay
   const og=ctx.createLinearGradient(0,0,0,FH);
   og.addColorStop(0,'rgba(0,0,0,.05)');og.addColorStop(.4,'rgba(0,0,0,0)');og.addColorStop(.65,'rgba(0,0,0,0)');og.addColorStop(1,'rgba(0,0,0,.45)');
@@ -1179,15 +1292,22 @@ function vDraw(){
   const px=v=>(v/1920)*FH;
   const gop=fr>fmt.fr-20?ilerp(fr,fmt.fr-20,fmt.fr,1,0):1;
   ctx.globalAlpha=gop;
+
   // Logo
   const lsp=Math.min(1,spSolve(fr));
   ctx.save();ctx.globalAlpha=gop*lsp;
   ctx.beginPath();const lx=px(70),ly=px(80)+ilerp(lsp,0,1,-px(60),0);
-  ctx.roundRect(lx,ly,px(56),px(56),px(14));ctx.fillStyle='rgba(255,255,255,.28)';ctx.fill();
+  if (ctx.roundRect) {
+    ctx.roundRect(lx,ly,px(56),px(56),px(14));
+  } else {
+    ctx.rect(lx,ly,px(56),px(56));
+  }
+  ctx.fillStyle='rgba(255,255,255,.28)';ctx.fill();
   ctx.font=`${px(32)}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';
   ctx.fillText('🌸',lx+px(28),ly+px(28));
   ctx.textAlign='left';ctx.textBaseline='top';ctx.font=`700 ${px(32)}px Georgia,serif`;ctx.fillStyle=f.text;
   ctx.fillText('Macaroon Garden',lx+px(72),ly+px(4));ctx.restore();
+
   // Emoji
   const esp=Math.min(1,spSolve(Math.max(0,fr-8),80,14));
   const erot=vState.anim==='float'?Math.sin(fr*.04)*8:0;
@@ -1196,6 +1316,7 @@ function vDraw(){
   const glg=ctx.createRadialGradient(0,0,0,0,0,px(280));glg.addColorStop(0,f.bg[0]+'88');glg.addColorStop(1,'transparent');
   ctx.fillStyle=glg;ctx.beginPath();ctx.arc(0,0,px(280),0,Math.PI*2);ctx.fill();
   ctx.font=`${fmt.w===fmt.h?px(200):px(280)}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(f.emoji,0,0);ctx.restore();
+
   // Pill
   const psp=Math.min(1,spSolve(Math.max(0,fr-22),200,20));
   if(psp>.01){
@@ -1203,11 +1324,18 @@ function vDraw(){
     ctx.font=`700 ${px(36)}px Georgia,serif`;
     const tw=ctx.measureText(f.name).width,pw=tw+px(80),ph=px(56),px2=FW/2-pw/2,py2=cyb+px(180);
     const scl=psp,cx=FW/2,cy=py2+ph/2;
-    ctx.setTransform(scl,0,0,scl,cx*(1-scl),cy*(1-scl));
-    ctx.beginPath();ctx.roundRect(px2,py2,pw,ph,ph/2);ctx.fillStyle='rgba(255,255,255,.88)';ctx.fill();
+    ctx.setTransform(scl*sc,0,0,scl*sc,cx*(1-scl)*sc,cy*(1-scl)*sc);
+    ctx.beginPath();
+    if (ctx.roundRect) {
+      ctx.roundRect(px2,py2,pw,ph,ph/2);
+    } else {
+      ctx.rect(px2,py2,pw,ph);
+    }
+    ctx.fillStyle='rgba(255,255,255,.88)';ctx.fill();
     ctx.fillStyle=f.text;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(f.name,FW/2,py2+ph/2);
     ctx.restore();
   }
+
   // Title
   const tsp=Math.min(1,spSolve(Math.max(0,fr-18),90,16));
   const bst=fmt.w===fmt.h?FH*.72:FH*.76;
@@ -1217,18 +1345,26 @@ function vDraw(){
   ctx.shadowColor='rgba(0,0,0,.4)';ctx.shadowBlur=px(20);
   vState.title.split('\n').forEach((l,i)=>ctx.fillText(l,px(70),bst+ilerp(tsp,0,1,px(50),0)+i*lh));
   ctx.restore();
+
   // Sub
   const ssp=Math.min(1,spSolve(Math.max(0,fr-28),90,16));
   ctx.save();ctx.globalAlpha=gop*ssp*.88;ctx.resetTransform();ctx.scale(sc,sc);
   ctx.font=`${px(fmt.w===fmt.h?28:38)}px 'DM Sans',sans-serif`;ctx.fillStyle='#fff';ctx.textAlign='left';ctx.textBaseline='top';
   ctx.shadowBlur=px(8);ctx.shadowColor='rgba(0,0,0,.3)';
   ctx.fillText(vState.sub,px(70),bst+vState.title.split('\n').length*lh+px(20)+ilerp(ssp,0,1,px(40),0));ctx.restore();
+
   // CTA
   const csp=Math.min(1,spSolve(Math.max(0,fr-40),90,16));
   if(csp>.02){
     ctx.save();ctx.globalAlpha=gop*csp;ctx.resetTransform();ctx.scale(sc,sc);
     const by=FH-px(160);
-    ctx.beginPath();ctx.roundRect(px(70),by,FW-px(140),px(90),px(22));ctx.fillStyle='rgba(255,255,255,.88)';
+    ctx.beginPath();
+    if (ctx.roundRect) {
+      ctx.roundRect(px(70),by,FW-px(140),px(90),px(22));
+    } else {
+      ctx.rect(px(70),by,FW-px(140),px(90));
+    }
+    ctx.fillStyle='rgba(255,255,255,.88)';
     ctx.shadowColor='rgba(0,0,0,.15)';ctx.shadowBlur=px(30);ctx.fill();ctx.shadowBlur=0;
     ctx.fillStyle=f.text;ctx.font=`600 ${px(30)}px 'DM Sans',sans-serif`;ctx.textAlign='left';ctx.textBaseline='middle';
     ctx.fillText(vState.cta,px(110),by+px(45));
@@ -1237,13 +1373,15 @@ function vDraw(){
     ctx.restore();
   }
   ctx.globalAlpha=1;
-  // Update timeline
+
+  // Timeline
   const pct=vState.frame/fmt.fr*100;
   const tf=document.getElementById('v-tl-fill');if(tf)tf.style.width=pct+'%';
   const fl=document.getElementById('v-frame-lbl');if(fl)fl.textContent=(vState.frame/30).toFixed(1)+'s';
 }
-function vPlay(){vState.playing=true;document.getElementById('v-play-btn').textContent='⏸';vLast=null;vAF=requestAnimationFrame(vTick);}
-function vPause(){vState.playing=false;document.getElementById('v-play-btn').textContent='▶';if(vAF)cancelAnimationFrame(vAF);}
+
+function vPlay(){vState.playing=true;const btn=document.getElementById('v-play-btn');if(btn)btn.textContent='⏸';vLast=null;vAF=requestAnimationFrame(vTick);}
+function vPause(){vState.playing=false;const btn=document.getElementById('v-play-btn');if(btn)btn.textContent='▶';if(vAF)cancelAnimationFrame(vAF);}
 function vTogglePlay(){vState.playing?vPause():vPlay();}
 function vTick(ts){if(!vLast)vLast=ts;vState.frame+=(ts-vLast)*30/1000;vLast=ts;if(vState.frame>=VFMT[vState.fmt].fr)vState.frame=0;vDraw();if(vState.playing)vAF=requestAnimationFrame(vTick);}
 function vScrub(e){const tl=document.getElementById('v-tl');const r=tl.getBoundingClientRect();const pct=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));vState.frame=pct*VFMT[vState.fmt].fr;vDraw();}
